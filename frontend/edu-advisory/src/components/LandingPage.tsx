@@ -17,11 +17,11 @@ import {
 } from 'lucide-react';
 
 interface LandingPageProps {
-  onStart: () => void;
   onAuth: (mode: 'login' | 'signup') => void;
+  onSignUpClick: () => void;
 }
 
-export default function LandingPage({ onStart, onAuth }: LandingPageProps) {
+export default function LandingPage({ onAuth, onSignUpClick }: LandingPageProps) {
   return (
     <div className="bg-white text-gray-900 font-sans">
       {/* Navigation */}
@@ -50,7 +50,7 @@ export default function LandingPage({ onStart, onAuth }: LandingPageProps) {
                 Login
               </button>
               <button 
-                onClick={() => onAuth('signup')}
+                onClick={onSignUpClick}
                 className="px-5 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-shadow hover:shadow-lg"
               >
                 Sign Up
@@ -76,7 +76,7 @@ export default function LandingPage({ onStart, onAuth }: LandingPageProps) {
               Get personalized career paths, discover nearby colleges, and unlock your true potential with our AI-driven guidance.
             </p>
             <button 
-              onClick={onStart}
+              onClick={onSignUpClick}
               className="px-8 py-4 bg-orange-500 text-white text-lg font-bold rounded-2xl hover:bg-orange-600 transition-all transform hover:scale-105 shadow-xl shadow-orange-200 flex items-center gap-2"
             >
               Start Your Journey
@@ -234,7 +234,7 @@ export default function LandingPage({ onStart, onAuth }: LandingPageProps) {
               It's free, easy, and made for students like you. Join thousands of others finding their path.
             </p>
             <button 
-              onClick={onStart}
+              onClick={onSignUpClick}
               className="px-10 py-4 bg-white text-green-600 text-lg font-bold rounded-2xl hover:bg-green-50 transition-all transform hover:scale-105 shadow-xl"
             >
               Get Started Now

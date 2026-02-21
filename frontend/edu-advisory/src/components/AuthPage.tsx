@@ -90,8 +90,9 @@ export default function AuthPage({ initialMode, onBack, onSuccess }: AuthPagePro
                       <select 
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all appearance-none bg-white text-gray-700"
                         required
+                        defaultValue=""
                       >
-                        <option value="" disabled selected>Select your category</option>
+                        <option value="" disabled>Select your category</option>
                         <option value="general">General (Open)</option>
                         <option value="obc">OBC (Other Backward Classes)</option>
                         <option value="sc">SC (Scheduled Caste)</option>

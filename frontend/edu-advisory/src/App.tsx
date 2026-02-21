@@ -17,15 +17,36 @@ export default function App() {
   const [view, setView] = useState<AppView>('loading');
   const [role, setRole] = useState<UserRole | null>(null);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [flowSource, setFlowSource] = useState<'normal' | 'signup'>('normal');
 
   const handleRoleSelect = (selectedRole: UserRole) => {
     setRole(selectedRole);
-    setView('advisor');
+    if (flowSource === 'signup' && selectedRole === 'student') {
+      setAuthMode('signup');
+      setView('auth');
+    } else {
+      setView('advisor');
+    }
   };
 
   const handleAuthStart = (mode: 'login' | 'signup') => {
+    setFlowSource('normal');
     setAuthMode(mode);
     setView('auth');
+  };
+
+  const handleSignUpClick = () => {
+    setFlowSource('signup');
+    setView('roleSelection');
+  };
+
+  const handleAuthSuccess = () => {
+    // "after selecting in sign up page there that will be get it you on role section page"
+    if (flowSource === 'signup') {
+      setView('advisor');
+    } else {
+      setView('roleSelection');
+    }
   };
 
   return (
@@ -51,8 +72,8 @@ export default function App() {
             transition={{ duration: 0.5 }}
           >
             <LandingPage 
-              onStart={() => setView('roleSelection')} 
               onAuth={handleAuthStart}
+              onSignUpClick={handleSignUpClick}
             />
           </motion.div>
         )}
@@ -68,7 +89,7 @@ export default function App() {
             <AuthPage 
               initialMode={authMode}
               onBack={() => setView('landing')}
-              onSuccess={() => setView('roleSelection')}
+              onSuccess={handleAuthSuccess}
             />
           </motion.div>
         )}
