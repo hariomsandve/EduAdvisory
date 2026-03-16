@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
-  Send, Mic, Trash2, Moon, Sun, Globe, Sparkles, 
-  MessageSquare, User, Bot
+  Send, Mic, Trash2, Globe 
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface Message {
   id: number;
@@ -33,12 +33,13 @@ export default function AdvisoraChat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
+    const userText = inputValue;
     const newMessage: Message = {
       id: messages.length + 1,
-      text: inputValue,
+      text: userText,
       sender: 'user',
       timestamp: new Date()
     };
@@ -47,17 +48,46 @@ export default function AdvisoraChat() {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: messages.length + 2,
-        text: "### कसा निवडावा? (How to choose?)\n\nतुमच्यासाठी योग्य मार्ग कोणता हे ठरवण्यासाठी खालील गोष्टींचा विचार करा:\n\n1. तुमची आवड (Your Interest):\n* तुम्हाला डेटाचे विश्लेषण करून त्यातून काही निष्कर्ष काढायला आवडते का?\n* की तुम्हाला सुंदर आणि वापरण्यास सोपे दिसणारे वेबपेजेस किंवा ॲप्स तयार करायला आवडतात?",
+    try {
+      // Using your working key!
+      const genAI = new GoogleGenerativeAI("AIzaSyCQWllM51HidUNNwBWD861oafEy1MEzSts");
+      
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        systemInstruction: `You are Avi, an expert Education Counselor and Career Guide for a platform called EduAdvisory. 
+        Your goal is to help students with career roadmaps, exam prep, college admissions, subject choices, and resolving career confusion. 
+        You must seamlessly speak and respond in ANY language the user types in (English, Hindi, Marathi, Spanish, etc.). 
+        Keep your responses friendly, highly structured, and easy to read using simple bullet points and spacing. Do not answer questions outside of education, careers, or student life.`
+      });
+
+      // 🔥 THE FIX IS HERE: .slice(1) removes the first bot greeting from history
+      const history = messages.slice(1).map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }],
+      }));
+
+      const chat = model.startChat({ history });
+      const result = await chat.sendMessage(userText);
+      const responseText = result.response.text();
+
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        text: responseText,
         sender: 'bot',
         timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
+      }]);
+
+    } catch (error: any) {
+      console.error("🔥 DETAILED AI ERROR:", error);
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        text: `Oops! An error occurred: ${error.message || 'Unknown error'}`,
+        sender: 'bot',
+        timestamp: new Date()
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleClearChat = () => {
@@ -97,7 +127,7 @@ export default function AdvisoraChat() {
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="font-bold text-gray-700">Avi is Multi-Lingual</span>
+            <span className="font-bold text-gray-700">Avi is Online & Multi-Lingual</span>
           </div>
           <div className="flex gap-2">
             <button 
@@ -160,7 +190,7 @@ export default function AdvisoraChat() {
             
             <button 
               onClick={handleSend}
-              disabled={!inputValue.trim()}
+              disabled={!inputValue.trim() || isTyping}
               className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-indigo-200"
             >
               Send <Send size={18} />
@@ -168,7 +198,7 @@ export default function AdvisoraChat() {
           </div>
           <div className="text-center mt-3">
             <button className="text-xs font-bold text-gray-400 hover:text-indigo-600 flex items-center justify-center gap-1 mx-auto transition-colors">
-              Auto-detect Language <Globe size={12} />
+              Powered by Live AI <Globe size={12} />
             </button>
           </div>
         </div>
