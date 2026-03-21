@@ -30,7 +30,10 @@ export default function App() {
     quizResults?: any;
   }>({});
   
-  const [registeredUsers, setRegisteredUsers] = useState<Record<string, string>>({});
+  const [registeredUsers, setRegisteredUsers] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('registeredUsers');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   const handleRoleSelect = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -69,14 +72,18 @@ export default function App() {
     let currentUserName = data.name;
 
     if (mode === 'signup' && data.name && data.email) {
-      setRegisteredUsers(prev => ({ ...prev, [data.email]: data.name! }));
+      const newUsers = { ...registeredUsers, [data.email]: data.name };
+      setRegisteredUsers(newUsers);
+      localStorage.setItem('registeredUsers', JSON.stringify(newUsers));
       currentUserName = data.name;
     } else if (mode === 'login' && data.email) {
       const storedName = registeredUsers[data.email];
       if (storedName) {
         currentUserName = storedName;
       } else {
-        currentUserName = 'Ragini';
+        // Capitalize the prefix as a nice fallback
+        const prefix = data.email.split('@')[0];
+        currentUserName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
       }
     }
 
@@ -217,7 +224,7 @@ export default function App() {
               <ParentDashboard />
             ) : (
               <Dashboard 
-                onNavigate={setView} 
+                onNavigate={(view) => setView(view as AppView)}  
                 onLogout={handleLogout} 
                 userName={userData.userName} 
               />

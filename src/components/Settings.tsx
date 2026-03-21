@@ -12,7 +12,12 @@ interface SettingSection {
   icon: any;
 }
 
-export default function Settings() {
+interface SettingsProps {
+  userName?: string;
+  email?: string;
+}
+
+export default function Settings({ userName = 'User', email = 'user@example.com' }: SettingsProps) {
   const [activeSection, setActiveSection] = useState('profile');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -101,11 +106,11 @@ export default function Settings() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700">Full Name</label>
-                      <input type="text" defaultValue="Ragini" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      <input type="text" defaultValue={userName} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700">Email Address</label>
-                      <input type="email" defaultValue="ragini@example.com" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      <input type="email" defaultValue={email} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" />
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-sm font-bold text-gray-700">Bio</label>

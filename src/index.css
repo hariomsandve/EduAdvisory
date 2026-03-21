@@ -8,3 +8,15 @@ html {
 body {
   font-family: 'Inter', sans-serif;
 }
+
+/* Make scrollbars invisible */
+.no-scrollbar::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.custom-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

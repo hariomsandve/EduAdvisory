@@ -6,6 +6,7 @@ import {
   ArrowRight, Sparkles, CheckCircle2, Loader2, ArrowLeft, Users, Menu, ChevronLeft, ChevronRight, Share2, Library, Brain, Timer
 } from 'lucide-react';
 import UserProfile from './UserProfile';
+import MyApplications from './MyApplications';
 import CommunityForum from './CommunityForum';
 import EduLearn from './EduLearn';
 import AptitudeQuiz from './AptitudeQuiz';
@@ -37,7 +38,7 @@ interface DashboardProps {
 export default function Dashboard({ onNavigate, onLogout, userName: propUserName }: DashboardProps) {
   const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [userName, setUserName] = useState(propUserName || 'Ragini');
+  const [userName, setUserName] = useState(propUserName || 'User');
 
   // Update local userName when prop changes
   if (propUserName && propUserName !== userName) {
@@ -130,10 +131,10 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
         initial={{ width: 280 }}
         animate={{ width: isSidebarOpen ? 280 : 80 }} 
         transition={{ duration: 0.3, type: "spring", stiffness: 100, damping: 20 }} 
-        className="bg-white shadow-xl z-20 flex flex-col relative border-r border-gray-100"
+        className="bg-white shadow-xl z-20 flex flex-col relative"
       >
         {/* Logo Area */}
-        <div className={`flex items-center gap-3 h-20 px-6 border-b border-gray-50 ${isSidebarOpen ? 'justify-start' : 'justify-center'}`}>
+        <div className={`flex items-center gap-3 h-20 px-6 ${isSidebarOpen ? 'justify-start' : 'justify-center'}`}>
           <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain shrink-0" />
           <AnimatePresence>
             {isSidebarOpen && (
@@ -195,7 +196,7 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
         </nav>
 
         {/* User Profile Snippet (Bottom) */}
-        <div className="p-4 border-t border-gray-50">
+        <div className="p-4">
           <button 
             onClick={() => setActiveMenuItem('profile')}
             className={`flex items-center gap-3 w-full text-left ${!isSidebarOpen ? 'justify-center' : ''}`}
@@ -319,6 +320,8 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
               <TimelineNotifications />
             ) : activeMenuItem === 'internships' ? (
               <InternshipPortal />
+            ) : activeMenuItem === 'myApplications' ? (
+              <MyApplications />
             ) : activeMenuItem === 'eventsWebinars' ? (
               <EventsWebinars />
             ) : activeMenuItem === 'mockInterviews' ? (
@@ -330,7 +333,7 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
             ) : activeMenuItem === 'homeworkAnalyzer' ? (
               <HomeworkAnalyzer />
             ) : activeMenuItem === 'settings' ? (
-              <SettingsComponent />
+              <SettingsComponent userName={userName} />
             ) : activeMenuItem === 'reels' ? (
               <EduReels />
             ) : activeMenuItem === 'helpFAQ' ? (
