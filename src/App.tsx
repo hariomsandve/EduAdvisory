@@ -24,6 +24,7 @@ export default function App() {
   const [flowSource, setFlowSource] = useState<'normal' | 'signup'>('normal');
   const [userData, setUserData] = useState<{ 
     userName?: string;
+    userEmail?: string;
     selectedClass?: string; 
     selectedInterests?: string[];
     quizCompleted?: boolean;
@@ -87,9 +88,11 @@ export default function App() {
       }
     }
 
-    if (currentUserName) {
-      setUserData(prev => ({ ...prev, userName: currentUserName }));
-    }
+    setUserData(prev => ({ 
+      ...prev, 
+      userName: currentUserName || prev.userName,
+      userEmail: data.email 
+    }));
     
     if (role === 'parent' || mode === 'login') {
       setView('dashboard');
@@ -221,12 +224,16 @@ export default function App() {
           >
             {/* ✅ Routed to the correct dashboard based on role */}
             {role === 'parent' ? (
-              <ParentDashboard />
+              <ParentDashboard 
+                userName={userData.userName}
+                onLogout={handleLogout}
+              />
             ) : (
               <Dashboard 
                 onNavigate={(view) => setView(view as AppView)}  
                 onLogout={handleLogout} 
                 userName={userData.userName} 
+                userEmail={userData.userEmail}
               />
             )}
           </motion.div>

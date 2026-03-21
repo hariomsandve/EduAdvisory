@@ -1,318 +1,412 @@
-
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-
-// Icon Components
-const Icon = ({ name, className = '' }) => {
-  const iconMap = {
-    Home: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v7a1 1 0 001 1h12a1 1 0 001-1V9m-9 4v4m0 0H9m3 0h3" /></svg>,
-    MessageSquare: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>,
-    Calendar: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
-    DollarSign: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-    Bell: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>,
-    BookOpen: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17s4.5 10.747 10 10.747c5.5 0 10-4.998 10-10.747S17.5 6.253 12 6.253z" /></svg>,
-    MoreHorizontal: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>,
-    Plus: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>,
-    RefreshCw: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>,
-    Check: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>,
-    ChevronLeft: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>,
-    ChevronRight: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>,
-    Search: <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
-  };
-  return iconMap[name] || null;
-};
-
-// Icon aliases for easier use
-const FiHome = (props) => <Icon name="Home" {...props} />;
-const FiMessageSquare = (props) => <Icon name="MessageSquare" {...props} />;
-const FiCalendar = (props) => <Icon name="Calendar" {...props} />;
-const FiDollarSign = (props) => <Icon name="DollarSign" {...props} />;
-const FiBell = (props) => <Icon name="Bell" {...props} />;
-const FiBookOpen = (props) => <Icon name="BookOpen" {...props} />;
-const FiMoreHorizontal = (props) => <Icon name="MoreHorizontal" {...props} />;
-const FiPlus = (props) => <Icon name="Plus" {...props} />;
-const FiRefreshCw = (props) => <Icon name="RefreshCw" {...props} />;
-const FiCheck = (props) => <Icon name="Check" {...props} />;
-const FiChevronLeft = (props) => <Icon name="ChevronLeft" {...props} />;
-const FiChevronRight = (props) => <Icon name="ChevronRight" {...props} />;
-const FiSearch = (props) => <Icon name="Search" {...props} />;
+import { motion, AnimatePresence } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
+import { 
+  Home, MessageSquare, Calendar, CreditCard, Bell, BookOpen, 
+  MoreHorizontal, Plus, RefreshCw, CheckCircle2, ChevronLeft, 
+  ChevronRight, Search, Settings, LogOut, TrendingUp, Users, Target, BookMarked, Brain, Shield, Star
+} from 'lucide-react';
 
 // Mock Data
 const childData = [
-  { id: 1, name: 'Alex', avatar: 'https://randomuser.me/api/portraits/thumb/men/75.jpg' },
-  { id: 2, name: 'Sarah', avatar: 'https://randomuser.me/api/portraits/thumb/women/75.jpg' },
-  { id: 3, name: 'David', avatar: 'https://randomuser.me/api/portraits/thumb/men/76.jpg' },
+  { id: 1, name: 'Alex (11th)', avatar: 'https://picsum.photos/seed/alex/100/100' },
+  { id: 2, name: 'Sarah (9th)', avatar: 'https://picsum.photos/seed/sarah/100/100' }
 ];
 
 const goalsData = [
-  { title: 'Complete 13 sessions', progress: 65, color: '#3B82F6' },
-  { title: 'Complete 7 sessions', progress: 85, color: '#10B981' },
+  { title: 'Aptitude Tests', completed: 3, total: 5, progress: 60, color: 'text-orange-500', bg: 'bg-orange-500', lightBg: 'bg-orange-50' },
+  { title: 'Career Prep Sessions', completed: 7, total: 10, progress: 70, color: 'text-green-500', bg: 'bg-green-500', lightBg: 'bg-green-50' },
+  { title: 'Math Modules', completed: 15, total: 20, progress: 75, color: 'text-blue-500', bg: 'bg-blue-500', lightBg: 'bg-blue-50' }
 ];
 
 const recommendedTutors = [
-  { subject: 'Mathematics', desc: 'Algebra, Geometry', tutor: 'Mr. Smith', avatar: 'https://randomuser.me/api/portraits/thumb/men/77.jpg' },
-  { subject: 'Physics', desc: 'Mechanics, Optics', tutor: 'Ms. Jones', avatar: 'https://randomuser.me/api/portraits/thumb/women/77.jpg' },
+  { subject: 'Advanced Mathematics', target: 'JEE Prep', tutor: 'Prof. Sharma', rating: 4.9, avatar: 'https://picsum.photos/seed/prof1/100/100' },
+  { subject: 'Physics & Mechanics', target: 'Board Exams', tutor: 'Ms. Verma', rating: 4.8, avatar: 'https://picsum.photos/seed/prof2/100/100' },
 ];
 
 const subjectsData = [
-    { name: 'Mathematics', tutor: 'Mr. Smith', time: '10:00 - 11:00 AM' },
-    { name: 'Physics', tutor: 'Ms. Jones', time: '1:00 - 2:00 PM' },
-    { name: 'History', tutor: 'Mr. Brown', time: '3:00 - 4:00 PM' },
-    { name: 'English', tutor: 'Ms. Davis', time: '5:00 - 6:00 PM' },
+    { name: 'Mathematics', tutor: 'Prof. Sharma', time: '10:00 - 11:30 AM', status: 'Upcoming' },
+    { name: 'Physics', tutor: 'Ms. Verma', time: '1:00 - 2:00 PM', status: 'Completed' },
+    { name: 'Chemistry', tutor: 'Dr. Rao', time: '3:00 - 4:00 PM', status: 'Upcoming' }
 ];
 
-const dailyActivityData = [
-  { day: 'Mon', hours: 2 },
-  { day: 'Tue', hours: 3 },
-  { day: 'Wed', hours: 4 },
-  { day: 'Thu', hours: 2.5 },
-  { day: 'Fri', hours: 5 },
-  { day: 'Sat', hours: 6 },
-  { day: 'Sun', hours: 1 },
+const weeklyProgressData = [
+  { day: 'Mon', hours: 2, focus: 85 },
+  { day: 'Tue', hours: 3.5, focus: 90 },
+  { day: 'Wed', hours: 4, focus: 88 },
+  { day: 'Thu', hours: 2.5, focus: 75 },
+  { day: 'Fri', hours: 5, focus: 95 },
+  { day: 'Sat', hours: 6, focus: 92 },
+  { day: 'Sun', hours: 1, focus: 60 },
 ];
 
-const upcomingLessons = [
-  { subject: 'Mathematics', date: '2024-07-28', time: '10:00 AM', participants: ['Alex'] },
-  { subject: 'Physics', date: '2024-07-29', time: '1:00 PM', participants: ['Sarah'] },
+const upcomingEvents = [
+  { title: 'Parent-Counselor Meet', date: 'Tomorrow', time: '10:00 AM', participants: ['Alex'], type: 'meeting' },
+  { title: 'Physics Mock Test', date: '24 Oct', time: '2:00 PM', participants: ['Alex'], type: 'test' },
+  { title: 'Career Path Workshop', date: '26 Oct', time: '5:00 PM', participants: ['Sarah'], type: 'workshop' },
 ];
 
-// Reusable Components
-const Card = ({ children, className = '' }) => (
-  <div className={`bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-lg p-6 ${className}`}>
-    {children}
+// Reusable Circular Progress
+const CircularProgress = ({ progress, barColor }: { progress: number, barColor: string }) => (
+  <div className="relative w-20 h-20 flex items-center justify-center">
+    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+      <circle className="text-gray-100 stroke-current" strokeWidth="8" cx="50" cy="50" r="40" fill="transparent"></circle>
+      <circle
+        className={`${barColor} stroke-current transition-all duration-1000 ease-out`}
+        strokeWidth="8"
+        strokeLinecap="round"
+        cx="50" cy="50" r="40" fill="transparent"
+        strokeDasharray="251.2"
+        strokeDashoffset={251.2 - (251.2 * progress) / 100}
+      ></circle>
+    </svg>
+    <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-800">
+      {progress}%
+    </div>
   </div>
 );
 
-const SidebarMenuItem = ({ icon, text, active = false }) => (
-  <a href="#" className={`flex items-center space-x-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-blue-600/20 transition-all duration-200 relative ${active ? 'text-white' : ''}`}>
-    {active && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full"></div>}
-    {React.createElement(icon, { className: "w-6 h-6" })}
-    <span className="font-medium">{text}</span>
-  </a>
-);
+interface ParentDashboardProps {
+  userName?: string;
+  onLogout?: () => void;
+}
 
-const CircularProgress = ({ progress, color }) => (
-    <div className="relative w-24 h-24">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <circle
-          className="text-gray-700"
-          strokeWidth="10"
-          stroke="currentColor"
-          fill="transparent"
-          r="45"
-          cx="50"
-          cy="50"
-        />
-        <circle
-          className={`text-[${color}]`}
-          strokeWidth="10"
-          strokeDasharray="283"
-          strokeDashoffset={283 - (283 * progress) / 100}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="transparent"
-          r="45"
-          cx="50"
-          cy="50"
-          style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xl font-bold text-white">{progress}%</span>
-      </div>
-    </div>
-  );
-  
+const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps) => {
+  const [activeChild, setActiveChild] = useState(childData[0].id);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
 
-const ParentDashboard = () => {
-  const [activeChild, setActiveChild] = useState(1);
-  const [darkMode, setDarkMode] = useState(true);
+  const menuItems = [
+    { id: 'dashboard', label: 'Monitor Dashboard', icon: Home },
+    { id: 'progress', label: 'Academic Progress', icon: TrendingUp },
+    { id: 'messages', label: 'Counselor Chat', icon: MessageSquare },
+    { id: 'calendar', label: 'Schedule & Tests', icon: Calendar },
+    { id: 'finances', label: 'Payments', icon: CreditCard },
+    { id: 'resources', label: 'Parent Guides', icon: BookOpen },
+    { id: 'settings', label: 'Settings', icon: Settings }
+  ];
 
   return (
-    <div className={`flex min-h-screen font-sans bg-gray-900 text-white ${darkMode ? 'dark' : ''}`}>
-      {/* Left Sidebar */}
-      <aside className="w-64 bg-gray-800/30 backdrop-blur-xl border-r border-gray-700/50 p-6 flex-shrink-0 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center space-x-3 mb-10">
-            <div className="w-10 h-10 bg-blue-500 rounded-full"></div>
-            <span className="text-xl font-bold">EduPro</span>
-          </div>
-          <nav className="space-y-2">
-            <SidebarMenuItem icon={FiHome} text="Dashboard" active />
-            <SidebarMenuItem icon={FiMessageSquare} text="Messages" />
-            <SidebarMenuItem icon={FiCalendar} text="Calendar" />
-            <SidebarMenuItem icon={FiDollarSign} text="Finances" />
-            <SidebarMenuItem icon={FiBell} text="Notifications" />
-            <SidebarMenuItem icon={FiBookOpen} text="Classroom" />
-            <SidebarMenuItem icon={FiMoreHorizontal} text="More" />
-          </nav>
+    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
+      
+      {/* Sidebar */}
+      <motion.div 
+        initial={{ width: 280 }}
+        animate={{ width: isSidebarOpen ? 280 : 80 }} 
+        transition={{ duration: 0.3, type: "spring", stiffness: 100, damping: 20 }} 
+        className="bg-white shadow-xl z-20 flex flex-col relative shrink-0"
+      >
+        {/* Logo Area */}
+        <div className={`flex items-center gap-3 h-20 px-6 ${isSidebarOpen ? 'justify-start' : 'justify-center'}`}>
+          <Shield className="text-green-600 shrink-0" size={32} />
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.span 
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="text-xl font-bold tracking-tight whitespace-nowrap overflow-hidden"
+              >
+                Edu-<span className="text-orange-500">Parent</span>
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
-        <div>
-          <Card className="text-center mb-4">
-            <p className="text-gray-400 text-sm">Balance</p>
-            <p className="text-2xl font-bold">$365.00</p>
-            <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-              Top-Up
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="absolute -right-3 top-24 bg-white border border-gray-200 text-gray-500 hover:text-orange-600 rounded-full p-1.5 shadow-md hover:shadow-lg transition-all z-50"
+        >
+          {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+        </button>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1 custom-scrollbar">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveMenuItem(item.id)}
+              className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-left transition-all group relative ${
+                activeMenuItem === item.id 
+                  ? 'bg-orange-50 text-orange-600 font-semibold shadow-sm border border-orange-100/50' 
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+              } ${!isSidebarOpen ? 'justify-center' : ''}`}
+            >
+              <item.icon size={22} className={`shrink-0 ${activeMenuItem === item.id ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+              
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span 
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="whitespace-nowrap overflow-hidden"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
-          </Card>
-          <div className="flex items-center space-x-3">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Parent" className="w-10 h-10 rounded-full" />
-            <div>
-              <p className="font-semibold">Jane Doe</p>
-              <p className="text-sm text-gray-400">Parent</p>
-            </div>
-          </div>
+          ))}
+        </nav>
+
+        {/* Log Out Button */}
+        <div className="p-4 border-t border-gray-100">
+          <button 
+            onClick={onLogout}
+            className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-left text-red-500 hover:bg-red-50 transition-all ${!isSidebarOpen ? 'justify-center' : ''}`}
+          >
+            <LogOut size={22} className="shrink-0" />
+            <AnimatePresence>
+              {isSidebarOpen && (
+                <motion.span 
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="whitespace-nowrap overflow-hidden font-medium"
+                >
+                  Sign Out
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
-      </aside>
+      </motion.div>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <header className="flex justify-between items-center mb-8">
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-gray-50/50">
+        
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 px-8 flex justify-between items-center shrink-0 sticky top-0 z-10">
           <div>
-            <h1 className="text-3xl font-bold">Welcome, Jane!</h1>
-            <p className="text-gray-400">Plan your children’s learning process</p>
+            <h1 className="text-2xl font-black text-gray-900 hidden md:block">Parent Portal</h1>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              {childData.map(child => (
-                <img
-                  key={child.id}
-                  src={child.avatar}
-                  alt={child.name}
-                  className={`w-12 h-12 rounded-full cursor-pointer border-2 transition-all ${activeChild === child.id ? 'border-blue-500' : 'border-transparent'}`}
-                  onClick={() => setActiveChild(child.id)}
-                />
-              ))}
+          <div className="flex items-center gap-6">
+            
+            <div className="relative hidden md:block w-64">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input type="text" placeholder="Search reports..." className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-orange-200 text-sm"/>
             </div>
-            <button className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
-              <FiPlus className="w-6 h-6 text-gray-400" />
+
+            <button className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-colors">
+              <Bell size={20} />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Search..." className="bg-gray-800 border border-gray-700 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            
+            <div className="h-8 w-px bg-gray-200"></div>
+            
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="font-bold text-sm text-gray-900">{userName}</p>
+                <p className="text-xs text-gray-500 font-medium">Guardian Account</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-green-400 flex items-center justify-center text-white font-bold shadow-md border-2 border-white">
+                {userName.charAt(0).toUpperCase()}
+              </div>
             </div>
-            <button onClick={() => setDarkMode(!darkMode)} className="p-2 bg-gray-800 rounded-lg">
-                {darkMode ? 'Light' : 'Dark'} Mode
-            </button>
           </div>
         </header>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-                {/* Goals */}
-                <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Goals</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {goalsData.map((goal, index) => (
-                    <Card key={index} className="flex items-center space-x-6">
-                        <CircularProgress progress={goal.progress} color={goal.color} />
-                        <div>
-                        <p className="font-semibold text-lg">{goal.title}</p>
-                        <p className="text-sm text-gray-400">Progress</p>
-                        </div>
-                    </Card>
-                    ))}
+
+        {/* Scrollable Dashboard Body */}
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 scroll-smooth">
+          <div className="max-w-7xl mx-auto space-y-8">
+            
+            {/* Child Selector & Welcome Card */}
+            <div className="flex flex-col xl:flex-row gap-8">
+              {/* Welcome */}
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 flex-1 text-white rounded-[32px] p-8 lg:p-10 shadow-xl shadow-orange-500/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                <div className="relative z-10 h-full flex flex-col justify-center">
+                  <h2 className="text-3xl lg:text-4xl font-black mb-3 text-white">Hello, {userName}!</h2>
+                  <p className="text-orange-100 text-lg flex items-center gap-2 mb-6 max-w-md">
+                    Stay intimately connected with your child's academic progress and career roadmap.
+                  </p>
+                  <div className="flex gap-4">
+                     <button className="bg-white text-orange-600 px-6 py-2.5 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:bg-orange-50 transition-colors">
+                        <Users size={18} /> Book Counselor
+                     </button>
+                     <button className="bg-orange-600 border border-orange-400 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-700 transition-colors hidden sm:block">
+                        View Detailed Report
+                     </button>
+                  </div>
                 </div>
-                </section>
+              </div>
+
+              {/* Child Profile Cards */}
+              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 shrink-0 w-full xl:w-[350px]">
+                 <div className="flex justify-between items-center mb-6">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                      <Target size={20} className="text-green-500"/> Select Child Profile
+                    </h3>
+                    <button className="p-1.5 bg-gray-50 text-gray-500 rounded-lg hover:text-green-600"><Plus size={18}/></button>
+                 </div>
+                 
+                 <div className="space-y-4">
+                    {childData.map((child) => (
+                       <div 
+                          key={child.id}
+                          onClick={() => setActiveChild(child.id)}
+                          className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border-2 ${activeChild === child.id ? 'border-green-500 bg-green-50/50 shadow-md' : 'border-transparent bg-gray-50 hover:bg-gray-100'}`}
+                       >
+                          <img src={child.avatar} alt="child" className="w-14 h-14 rounded-full border-2 border-white shadow-sm" />
+                          <div>
+                             <p className="font-bold text-gray-900 text-lg">{child.name}</p>
+                             <div className="flex gap-2 text-xs mt-1">
+                                <span className="bg-white px-2 py-0.5 rounded text-gray-600">Avg Grade: A</span>
+                                <span className="bg-white px-2 py-0.5 rounded text-gray-600">Track: PCM</span>
+                             </div>
+                          </div>
+                          {activeChild === child.id && <CheckCircle2 size={24} className="text-green-500 ml-auto" />}
+                       </div>
+                    ))}
+                 </div>
+              </div>
+            </div>
+
+            {/* Grid Stats Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              <div className="lg:col-span-2 space-y-8">
+                {/* Academic Goals Tracker */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-gray-900">Weekly Milestones</h2>
+                    <span className="text-sm font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-lg">This Week</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {goalsData.map((goal, index) => (
+                      <div key={index} className={`p-5 rounded-3xl border border-gray-100 ${goal.lightBg}`}>
+                        <div className="flex justify-between items-start mb-4">
+                           <div className={`p-2 bg-white rounded-xl shadow-sm ${goal.color}`}>
+                              <BookMarked size={20} />
+                           </div>
+                           <CircularProgress progress={goal.progress} barColor={goal.color} />
+                        </div>
+                        <p className="font-bold text-gray-900 mt-2">{goal.title}</p>
+                        <p className="text-sm text-gray-500 mt-1">{goal.completed} of {goal.total} tasks completed</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Progress Chart */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+                   <div className="flex justify-between items-center mb-8">
+                     <h2 className="text-xl font-bold text-gray-900">Study Hours & Focus Score</h2>
+                     <button className="text-sm text-gray-500 hover:text-green-600 font-medium">Export Data</button>
+                   </div>
+                   <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={weeklyProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+                          cursor={{ stroke: '#f97316', strokeWidth: 1, strokeDasharray: '3 3' }}
+                        />
+                        <Area type="monotone" dataKey="hours" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorHours)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                   </div>
+                </div>
 
                 {/* Recommended Tutors */}
-                <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Recommended Tutors</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Expert Recommendations</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {recommendedTutors.map((tutor, index) => (
-                    <Card key={index}>
-                        <div className="flex items-start justify-between">
-                        <div>
-                            <p className="font-bold text-lg text-blue-400">{tutor.subject}</p>
-                            <p className="text-sm text-gray-400">{tutor.desc}</p>
+                      <div key={index} className="p-5 border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-md transition-all rounded-2xl group">
+                        <div className="flex gap-4">
+                          <img src={tutor.avatar} alt="Tutor" className="w-14 h-14 rounded-full border border-gray-200" />
+                          <div className="flex-1">
+                              <div className="flex justify-between">
+                                 <p className="font-bold text-gray-900">{tutor.subject}</p>
+                                 <span className="flex items-center text-xs font-bold text-yellow-500 bg-yellow-50 px-1.5 py-0.5 rounded"><Star size={12} className="mr-0.5 fill-yellow-500"/> {tutor.rating}</span>
+                              </div>
+                              <p className="text-sm text-gray-500 mt-0.5">{tutor.tutor} • {tutor.target}</p>
+                              
+                              <div className="flex gap-2 mt-4">
+                                <button className="flex-1 bg-white border border-gray-200 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:border-gray-300">View Profile</button>
+                                <button className="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold hover:bg-green-600">Connect</button>
+                              </div>
+                          </div>
                         </div>
-                        <img src={tutor.avatar} alt="Tutor" className="w-12 h-12 rounded-full border-2 border-gray-600" />
-                        </div>
-                        <div className="mt-6 flex space-x-2">
-                        <button className="p-3 bg-gray-700/50 rounded-full hover:bg-gray-600 transition-colors"><FiRefreshCw/></button>
-                        <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors">
-                            <FiCheck />
-                            <span>Confirm</span>
-                        </button>
-                        </div>
-                    </Card>
+                      </div>
                     ))}
+                  </div>
                 </div>
-                </section>
-                
-                {/* Subjects */}
-                <section>
-                    <h2 className="text-xl font-semibold mb-4">Subjects</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              </div>
+
+              {/* Right Sidebar widgets */}
+              <div className="space-y-8">
+                {/* Upcoming Schedule */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+                   <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-gray-900">Agenda</h2>
+                      <div className="flex space-x-1">
+                          <button className="p-1 bg-gray-50 text-gray-400 rounded-lg hover:text-gray-900"><ChevronLeft size={20}/></button>
+                          <button className="p-1 bg-gray-50 text-gray-400 rounded-lg hover:text-gray-900"><ChevronRight size={20}/></button>
+                      </div>
+                   </div>
+                   
+                   <div className="space-y-4">
+                     {upcomingEvents.map((event, index) => (
+                       <div key={index} className="flex gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-orange-200 transition-colors cursor-pointer group">
+                          <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 ${event.type === 'meeting' ? 'bg-orange-100 text-orange-600' : event.type === 'test' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                             <span className="text-xs font-bold uppercase">{event.date.split(' ')[0]}</span>
+                             <span className="text-lg font-black">{event.date.split(' ')[1] || 'TMR'}</span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{event.title}</p>
+                            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
+                              <Calendar size={14}/> {event.time}
+                            </p>
+                          </div>
+                       </div>
+                     ))}
+                   </div>
+                   
+                   <button className="w-full mt-6 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-orange-300 hover:text-orange-500 transition-all flex items-center justify-center gap-2">
+                     <Plus size={18}/> Schedule Meeting
+                   </button>
+                </div>
+
+                {/* Subject Monitoring */}
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-8 shadow-xl text-white relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="flex justify-between items-center mb-6 relative z-10">
+                      <h2 className="text-xl font-bold">Class Monitoring</h2>
+                      <Brain className="text-orange-400" size={24}/>
+                    </div>
+                    
+                    <div className="space-y-4 relative z-10">
                         {subjectsData.map((subject, index) => (
-                            <Card key={index} className="flex justify-between items-center">
+                            <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors cursor-pointer">
                                 <div>
-                                    <p className="font-bold text-lg">{subject.name}</p>
-                                    <p className="text-sm text-gray-400">{subject.tutor}</p>
+                                    <p className="font-bold text-white text-sm">{subject.name}</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">{subject.tutor} • {subject.time}</p>
                                 </div>
-                                <p className="font-semibold text-blue-400">{subject.time}</p>
-                            </Card>
+                                <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ${subject.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                                  {subject.status}
+                                </span>
+                            </div>
                         ))}
                     </div>
-                </section>
-            </div>
-          
-            {/* Right Sidebar */}
-            <aside>
-                {/* Daily Activity */}
-                <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Daily Activity</h2>
-                <Card>
-                    <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={dailyActivityData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                        <XAxis dataKey="day" tick={{ fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                        <Tooltip
-                        contentStyle={{
-                            backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                            borderColor: 'rgba(55, 65, 81, 1)',
-                            color: '#fff'
-                        }}
-                        />
-                        <Bar dataKey="hours" radius={[10, 10, 0, 0]}>
-                            {dailyActivityData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={index === 4 ? '#3B82F6' : '#4B5563'} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                    </ResponsiveContainer>
-                </Card>
-                </section>
+                </div>
 
-                {/* Upcoming Lessons */}
-                <section>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Upcoming Lessons</h2>
-                    <div className="flex space-x-2">
-                        <button className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors"><FiChevronLeft/></button>
-                        <button className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors"><FiChevronRight/></button>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    {upcomingLessons.map((lesson, index) => (
-                    <Card key={index}>
-                        <p className="font-bold text-lg">{lesson.subject}</p>
-                        <p className="text-sm text-gray-400">{lesson.date} at {lesson.time}</p>
-                        <div className="mt-4 flex items-center justify-between">
-                            <div className="flex -space-x-2">
-                                {childData.filter(c => lesson.participants.includes(c.name)).map(c => (
-                                     <img key={c.id} src={c.avatar} alt={c.name} className="w-8 h-8 rounded-full border-2 border-gray-800"/>
-                                ))}
-                            </div>
-                            <button className="text-blue-500 font-semibold">Join</button>
-                        </div>
-                    </Card>
-                    ))}
-                </div>
-                </section>
-            </aside>
-        </div>
-      </main>
+              </div>
+            </div>
+            
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
