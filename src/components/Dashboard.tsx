@@ -33,9 +33,10 @@ interface DashboardProps {
   onNavigate: (view: string) => void;
   onLogout: () => void;
   userName?: string;
+  userEmail?: string;
 }
 
-export default function Dashboard({ onNavigate, onLogout, userName: propUserName }: DashboardProps) {
+export default function Dashboard({ onNavigate, onLogout, userName: propUserName, userEmail }: DashboardProps) {
   const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userName, setUserName] = useState(propUserName || 'User');
@@ -296,9 +297,9 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
             {activeMenuItem === 'profile' ? (
               <UserProfile 
                 userName={userName}
+                userEmail={userEmail}
                 userClass={userClass}
                 userLocation={userLocation}
-                onLogout={onLogout}
               />
             ) : activeMenuItem === 'communityForum' ? (
               <CommunityForum />
