@@ -18,7 +18,7 @@ export default function AuthPage({ initialMode, onBack, onSuccess }: AuthPagePro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate auth success
-    // For login, we simulate a user named "Ragini" if not found, but we pass the email
+    // For login, we will extract the name from the email if not found
     // For signup, we use the entered name
     const userName = mode === 'signup' ? name : undefined;
     onSuccess(mode, { name: userName, email });

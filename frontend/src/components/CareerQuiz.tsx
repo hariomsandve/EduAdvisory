@@ -114,7 +114,7 @@ export default function CareerQuiz({ onComplete, onSkip }: CareerQuizProps) {
   const [score, setScore] = useState(0);
 
   const marioContainerRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number>(0);
   const hitBlockRef = useRef<number | null>(null);
   const [facingRight, setFacingRight] = useState(true);
   
@@ -132,7 +132,7 @@ export default function CareerQuiz({ onComplete, onSkip }: CareerQuizProps) {
   useEffect(() => {
     if (step !== 'game') return;
 
-    const updatePhysics = () => {
+    const updatePhysics = (time?: number) => {
       const p = physics.current;
       const k = keys.current;
 
@@ -323,7 +323,7 @@ export default function CareerQuiz({ onComplete, onSkip }: CareerQuizProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mt-4">
-            <button onClick={() => { setCurrentLevel(0); setPlayerAnswers([]); setStep('intro'); setScore(0); hitBlockRef.current = null; physics.current.x = 50; }} className="px-6 py-4 bg-transparent hover:bg-white/10 text-white border-4 border-white text-[10px] md:text-xs transition-colors">
+            <button onClick={() => { setPlayerAnswers([]); setStep('intro'); setScore(0); hitBlockRef.current = null; physics.current.x = 50; }} className="px-6 py-4 bg-transparent hover:bg-white/10 text-white border-4 border-white text-[10px] md:text-xs transition-colors">
               PLAY AGAIN
             </button>
             <button onClick={() => onComplete && onComplete(result)} className="px-6 py-4 bg-[#c84c0c] hover:bg-[#e81416] text-white border-4 border-white text-[10px] md:text-xs transition-colors">

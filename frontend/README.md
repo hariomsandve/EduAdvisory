@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Edu-Advisory Pro
 
 **Edu-Advisory Pro** is a cutting-edge, AI-powered educational advisory application designed to provide personalized guidance to students and professionals. By leveraging advanced AI, this application helps users explore career paths, discover educational opportunities, and make informed decisions about their future. Whether you're a student planning your academic journey or a professional seeking career advice, Edu-Advisory Pro offers the tools and insights you need to succeed.
@@ -64,3 +65,30 @@
 ## Contributing
 
 Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
+=======
+EduAdvisory/
+│
+├── backend/
+│     ├── supabase/
+│     │      └── supabaseClient.js
+│     │
+│     ├── services/
+│     │      ├── auth.js
+│     │      ├── quiz.js
+│     │      ├── recommendation.js
+│     │      ├── colleges.js
+│     │      ├── scholarships.js
+│     │      └── resources.js
+│     │
+│     ├── ocr/
+│     │      └── handwriting.js  (later)
+│     │
+│     ├── testConnection.js
+│     └── .env.example
+│
+└── frontend/     (Hariom will manage this folder)
+       ├── index.html
+       ├── quiz.html
+       ├── result.html
+       └── etc...
+>>>>>>> f540947ee61afa23aadb5bc1d1cb98c0ecbe5c3f
