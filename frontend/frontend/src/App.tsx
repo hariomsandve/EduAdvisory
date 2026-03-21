@@ -205,7 +205,6 @@ export default function App() {
             transition={{ duration: 0.5 }}
           >
             <QuizResult 
-              userData={userData}
               onDashboard={() => setView('dashboard')}
               onRetake={() => setView('careerQuiz')}
             />
@@ -222,10 +221,7 @@ export default function App() {
           >
             {/* ✅ Routed to the correct dashboard based on role */}
             {role === 'parent' ? (
-              <ParentDashboard 
-                userName={userData.userName}
-                onLogout={handleLogout}
-              />
+              <ParentDashboard />
             ) : (
               <Dashboard 
                 onNavigate={(view) => setView(view as AppView)}  
