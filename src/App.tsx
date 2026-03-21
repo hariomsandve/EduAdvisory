@@ -221,7 +221,10 @@ export default function App() {
           >
             {/* ✅ Routed to the correct dashboard based on role */}
             {role === 'parent' ? (
-              <ParentDashboard />
+              <ParentDashboard 
+                userName={userData.userName}
+                onLogout={handleLogout}
+              />
             ) : (
               <Dashboard 
                 onNavigate={(view) => setView(view as AppView)}  
