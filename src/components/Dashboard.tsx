@@ -28,6 +28,7 @@ import HelpFAQ from './HelpFAQ';
 import GamifiedLearning from './GamifiedLearning';
 import CareerPaths from './CareerPaths';
 import FocusFlow from './FocusFlow';
+import ContactUs from './ContactUs';
 
 interface DashboardProps {
   onNavigate: (view: string) => void;
@@ -339,6 +340,8 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
               <EduReels />
             ) : activeMenuItem === 'helpFAQ' ? (
               <HelpFAQ />
+            ) : activeMenuItem === 'contactUs' ? (
+              <ContactUs />
             ) : activeMenuItem === 'gamifiedLearning' ? (
               <GamifiedLearning />
             ) : activeMenuItem === 'careerPaths' ? (
