@@ -10,12 +10,13 @@ import RoleSelection, { UserRole } from './components/RoleSelection';
 import InterestSelection from './components/InterestSelection';
 import CareerQuiz from './components/CareerQuiz';
 import AuthPage from './components/AuthPage';
+import ParentAuthPage from './components/ParentAuthPage';
 import Dashboard from './components/Dashboard'; // ✅ FIXED IMPORT
 import ParentDashboard from './components/ParentDashboard';
 import QuizResult from './components/QuizResult';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppView = 'loading' | 'landing' | 'roleSelection' | 'interestSelection' | 'careerQuiz' | 'auth' | 'dashboard' | 'quizResult';
+type AppView = 'loading' | 'landing' | 'roleSelection' | 'interestSelection' | 'careerQuiz' | 'auth' | 'parentAuth' | 'dashboard' | 'quizResult';
 
 export default function App() {
   const [view, setView] = useState<AppView>('loading');
@@ -40,7 +41,11 @@ export default function App() {
     setRole(selectedRole);
     setAuthMode('signup');
     setFlowSource('signup');
-    setView('auth');
+    if (selectedRole === 'parent') {
+      setView('parentAuth');
+    } else {
+      setView('auth');
+    }
   };
 
   const handleInterestComplete = (data: { selectedClass: string; selectedInterests: string[] }) => {
@@ -150,6 +155,22 @@ export default function App() {
             <AuthPage 
               initialMode={authMode}
               onBack={() => setView('landing')}
+              onSuccess={handleAuthSuccess}
+            />
+          </motion.div>
+        )}
+
+        {view === 'parentAuth' && (
+          <motion.div
+            key="parentAuth"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ParentAuthPage 
+              initialMode={authMode}
+              onBack={() => setView('roleSelection')}
               onSuccess={handleAuthSuccess}
             />
           </motion.div>

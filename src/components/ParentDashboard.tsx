@@ -14,7 +14,7 @@ const childData = [
 ];
 
 const goalsData = [
-  { title: 'Aptitude Tests', completed: 3, total: 5, progress: 60, color: 'text-orange-500', bg: 'bg-orange-500', lightBg: 'bg-orange-50' },
+  { title: 'Aptitude Tests', completed: 3, total: 5, progress: 60, color: 'text-green-500', bg: 'bg-green-500', lightBg: 'bg-green-50' },
   { title: 'Career Prep Sessions', completed: 7, total: 10, progress: 70, color: 'text-green-500', bg: 'bg-green-500', lightBg: 'bg-green-50' },
   { title: 'Math Modules', completed: 15, total: 20, progress: 75, color: 'text-blue-500', bg: 'bg-blue-500', lightBg: 'bg-blue-50' }
 ];
@@ -107,7 +107,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 exit={{ opacity: 0, width: 0 }}
                 className="text-xl font-bold tracking-tight whitespace-nowrap overflow-hidden"
               >
-                Edu-<span className="text-orange-500">Parent</span>
+                Edu-<span className="text-green-500">Parent</span>
               </motion.span>
             )}
           </AnimatePresence>
@@ -116,7 +116,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute -right-3 top-24 bg-white border border-gray-200 text-gray-500 hover:text-orange-600 rounded-full p-1.5 shadow-md hover:shadow-lg transition-all z-50"
+          className="absolute -right-3 top-24 bg-white border border-gray-200 text-gray-500 hover:text-green-600 rounded-full p-1.5 shadow-md hover:shadow-lg transition-all z-50"
         >
           {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </button>
@@ -129,11 +129,11 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
               onClick={() => setActiveMenuItem(item.id)}
               className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-left transition-all group relative ${
                 activeMenuItem === item.id 
-                  ? 'bg-orange-50 text-orange-600 font-semibold shadow-sm border border-orange-100/50' 
+                  ? 'bg-green-50 text-green-600 font-semibold shadow-sm border border-green-100/50' 
                   : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
               } ${!isSidebarOpen ? 'justify-center' : ''}`}
             >
-              <item.icon size={22} className={`shrink-0 ${activeMenuItem === item.id ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+              <item.icon size={22} className={`shrink-0 ${activeMenuItem === item.id ? 'text-green-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
               
               <AnimatePresence>
                 {isSidebarOpen && (
@@ -186,10 +186,10 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
             
             <div className="relative hidden md:block w-64">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Search reports..." className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-orange-200 text-sm"/>
+              <input type="text" placeholder="Search reports..." className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-green-200 text-sm"/>
             </div>
 
-            <button className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-colors">
+            <button className="relative p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-full transition-colors">
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
@@ -201,7 +201,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 <p className="font-bold text-sm text-gray-900">{userName}</p>
                 <p className="text-xs text-gray-500 font-medium">Guardian Account</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-green-400 flex items-center justify-center text-white font-bold shadow-md border-2 border-white">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-green-400 flex items-center justify-center text-white font-bold shadow-md border-2 border-white">
                 {userName.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -215,18 +215,18 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
             {/* Child Selector & Welcome Card */}
             <div className="flex flex-col xl:flex-row gap-8">
               {/* Welcome */}
-              <div className="bg-gradient-to-r from-orange-500 to-orange-600 flex-1 text-white rounded-[32px] p-8 lg:p-10 shadow-xl shadow-orange-500/20 relative overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 flex-1 text-white rounded-[32px] p-8 lg:p-10 shadow-xl shadow-green-500/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
                 <div className="relative z-10 h-full flex flex-col justify-center">
                   <h2 className="text-3xl lg:text-4xl font-black mb-3 text-white">Hello, {userName}!</h2>
-                  <p className="text-orange-100 text-lg flex items-center gap-2 mb-6 max-w-md">
+                  <p className="text-green-100 text-lg flex items-center gap-2 mb-6 max-w-md">
                     Stay intimately connected with your child's academic progress and career roadmap.
                   </p>
                   <div className="flex gap-4">
-                     <button className="bg-white text-orange-600 px-6 py-2.5 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:bg-orange-50 transition-colors">
+                     <button className="bg-white text-green-600 px-6 py-2.5 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:bg-green-50 transition-colors">
                         <Users size={18} /> Book Counselor
                      </button>
-                     <button className="bg-orange-600 border border-orange-400 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-700 transition-colors hidden sm:block">
+                     <button className="bg-green-600 border border-green-400 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition-colors hidden sm:block">
                         View Detailed Report
                      </button>
                   </div>
@@ -272,7 +272,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-gray-900">Weekly Milestones</h2>
-                    <span className="text-sm font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-lg">This Week</span>
+                    <span className="text-sm font-bold text-green-500 bg-green-50 px-3 py-1 rounded-lg">This Week</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {goalsData.map((goal, index) => (
@@ -301,17 +301,17 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                       <AreaChart data={weeklyProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                           <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
                         <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
                         <Tooltip 
                           contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                          cursor={{ stroke: '#f97316', strokeWidth: 1, strokeDasharray: '3 3' }}
+                          cursor={{ stroke: '#22c55e', strokeWidth: 1, strokeDasharray: '3 3' }}
                         />
-                        <Area type="monotone" dataKey="hours" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorHours)" />
+                        <Area type="monotone" dataKey="hours" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorHours)" />
                       </AreaChart>
                     </ResponsiveContainer>
                    </div>
@@ -358,13 +358,13 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                    
                    <div className="space-y-4">
                      {upcomingEvents.map((event, index) => (
-                       <div key={index} className="flex gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-orange-200 transition-colors cursor-pointer group">
-                          <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 ${event.type === 'meeting' ? 'bg-orange-100 text-orange-600' : event.type === 'test' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                       <div key={index} className="flex gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-green-200 transition-colors cursor-pointer group">
+                          <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 ${event.type === 'meeting' ? 'bg-green-100 text-green-600' : event.type === 'test' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                              <span className="text-xs font-bold uppercase">{event.date.split(' ')[0]}</span>
                              <span className="text-lg font-black">{event.date.split(' ')[1] || 'TMR'}</span>
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{event.title}</p>
+                            <p className="font-bold text-gray-900 group-hover:text-green-600 transition-colors">{event.title}</p>
                             <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
                               <Calendar size={14}/> {event.time}
                             </p>
@@ -373,7 +373,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                      ))}
                    </div>
                    
-                   <button className="w-full mt-6 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-orange-300 hover:text-orange-500 transition-all flex items-center justify-center gap-2">
+                   <button className="w-full mt-6 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-green-300 hover:text-green-500 transition-all flex items-center justify-center gap-2">
                      <Plus size={18}/> Schedule Meeting
                    </button>
                 </div>
@@ -383,7 +383,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                     <div className="flex justify-between items-center mb-6 relative z-10">
                       <h2 className="text-xl font-bold">Class Monitoring</h2>
-                      <Brain className="text-orange-400" size={24}/>
+                      <Brain className="text-green-400" size={24}/>
                     </div>
                     
                     <div className="space-y-4 relative z-10">
@@ -393,7 +393,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                                     <p className="font-bold text-white text-sm">{subject.name}</p>
                                     <p className="text-xs text-gray-400 mt-0.5">{subject.tutor} • {subject.time}</p>
                                 </div>
-                                <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ${subject.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                                <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ${subject.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 'bg-green-500/20 text-green-400'}`}>
                                   {subject.status}
                                 </span>
                             </div>
