@@ -20,22 +20,22 @@ export default function RoleSelection({ onSelect, onBack }: RoleSelectionProps) 
       color: 'border-orange-100 hover:border-orange-400 bg-orange-50/30'
     },
     {
-      id: 'parent' as UserRole,
-      title: 'Parent',
-      description: "Track your child's progress & view performance reports.",
-      icon: <Users size={48} className="text-orange-500" />,
-      // Changed from image to video source
-      videoSrc: "parents.mp4", 
-      color: 'border-orange-100 hover:border-orange-400 bg-orange-50/30'
-    },
-    {
       id: 'teacher' as UserRole,
       title: 'Teacher',
       description: 'Manage classes, upload notes & analyze trends.',
-      icon: <GraduationCap size={48} className="text-orange-500" />,
+      icon: <GraduationCap size={48} className="text-blue-500" />,
       // Changed from image to video source
       videoSrc: "teacher.mp4", 
-      color: 'border-orange-100 hover:border-orange-400 bg-orange-50/30'
+      color: 'border-blue-100 hover:border-blue-400 bg-blue-50/30'
+    },
+    {
+      id: 'parent' as UserRole,
+      title: 'Parent',
+      description: "Track your child's progress & view performance reports.",
+      icon: <Users size={48} className="text-green-500" />,
+      // Changed from image to video source
+      videoSrc: "parents.mp4", 
+      color: 'border-green-100 hover:border-green-400 bg-green-50/30'
     }
   ];
 
