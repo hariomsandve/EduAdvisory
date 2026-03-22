@@ -11,14 +11,19 @@ import {
   LogOut, TrendingUp, Users, Target, BookMarked, Brain, Shield, Star,
   Activity, Heart, Globe, MapPin, DollarSign, FileText, Compass, Award, Briefcase, Video,
   Zap, FileCheck, Mic, ClipboardList, BarChart2, History, AlertTriangle, TrendingDown,
-  Wallet, Coins, Volume2, Radio, UserPlus
+  Wallet, Coins, Volume2, Radio, UserPlus, Clock, PenTool, Camera, Smile, Edit3, Video as VideoIcon, PenBox, Map
 } from 'lucide-react';
 
 // Mock Data Definitions
 const childData = [
-  { id: 1, name: 'Alex (11th)', avatar: 'https://picsum.photos/seed/alex/100/100', track: 'PCM' },
-  { id: 2, name: 'Sarah (9th)', avatar: 'https://picsum.photos/seed/sarah/100/100', track: 'General' },
-  { id: 'all', name: 'Unified View', avatar: 'https://picsum.photos/seed/unified/100/100', track: 'All Children' }
+  { id: 1, name: 'Alex (11th)', avatar: 'https://picsum.photos/seed/alex/100/100', track: 'PCM', locationColor: 'bg-green-500', locationText: 'In Class: Room 302', lastSeen: 'Civil Engineering Lab, 10 mins ago' },
+  { id: 2, name: 'Sarah (9th)', avatar: 'https://picsum.photos/seed/sarah/100/100', track: 'General', locationColor: 'bg-yellow-500', locationText: 'On Campus: Library', lastSeen: 'Central Library, 5 mins ago' },
+  { id: 'all', name: 'Unified View', avatar: 'https://picsum.photos/seed/unified/100/100', track: 'All Children', locationColor: '', locationText: '', lastSeen: '' }
+];
+
+const ahaMoments = [
+  { id: 1, student: 'Alex', teacher: 'Dr. Carter', time: '2 hours ago', text: 'Alex finally nailed the bridge stress-test model! Beautiful use of tension distribution.', image: 'https://images.unsplash.com/photo-1541888086425-d81bb19240f5?q=80&w=400&h=200&auto=format&fit=crop' },
+  { id: 2, student: 'Sarah', teacher: 'Mr. Davis', time: '4 hours ago', text: 'Great presentation on the Solar System. The class loved the visuals!', image: 'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=400&h=200&auto=format&fit=crop' }
 ];
 
 const weeklyProgressData = [
@@ -143,6 +148,8 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
     { id: 'resources', label: 'Resource Center', icon: BookOpen },
     { id: 'productivity', label: 'Productivity Suite', icon: Zap },
     { id: 'community', label: 'Community Hub', icon: Globe },
+    { id: 'campusLife', label: 'Campus Life', icon: Map },
+    { id: 'collaboration', label: 'Collaboration Hub', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -167,7 +174,46 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+      {/* Smart Alerts */}
+      <div className="flex flex-col gap-4">
+         <div className="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-start gap-3 shadow-sm">
+            <Bell className="text-blue-500 shrink-0 mt-0.5" size={20}/>
+            <div>
+               <h4 className="font-bold text-blue-900 text-sm">Morning Briefing</h4>
+               <p className="text-sm text-blue-800">Alex has a heavy day today: 3 Lectures and a Physics Mock Exam at 2:00 PM. Wish him luck!</p>
+            </div>
+         </div>
+         <div className="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-start gap-3 shadow-sm">
+            <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20}/>
+            <div>
+               <h4 className="font-bold text-red-900 text-sm">"Empty Chair" Alert</h4>
+               <p className="text-sm text-red-800">Alex missed his 11:00 AM Fluid Mechanics lecture (but was marked Present at the main gate). Would you like to check in with him?</p>
+            </div>
+         </div>
+      </div>
+
+      {/* A-ha Moments Feed */}
+      <div>
+         <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2 mb-4">
+           <Camera size={20} className="text-green-500"/> Classroom Stories (A-ha! Moments)
+         </h3>
+         <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+            {ahaMoments.map(moment => (
+               <div key={moment.id} className="min-w-[300px] w-[300px] bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
+                  <img src={moment.image} alt="Classroom WIN" className="h-32 w-full object-cover"/>
+                  <div className="p-4 flex-1 flex flex-col">
+                     <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">{moment.teacher}</span>
+                        <span className="text-xs text-gray-400">{moment.time}</span>
+                     </div>
+                     <p className="text-sm text-gray-700 font-medium italic leading-relaxed">"{moment.text}"</p>
+                  </div>
+               </div>
+            ))}
+         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Child Selection / Unified Feed (Sibling Switcher) */}
         <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100">
            <div className="flex justify-between items-center mb-6">
@@ -186,7 +232,10 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                     <img src={child.avatar} alt="child" className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
                     <div className="flex-1">
                        <p className="font-bold text-gray-900">{child.name}</p>
-                       <p className="text-xs text-gray-500">{child.track}</p>
+                       <div className="flex items-center gap-2 mt-1">
+                          {child.locationColor && <span className={`w-2 h-2 rounded-full ${child.locationColor}`}></span>}
+                          <p className="text-xs text-gray-600 font-medium">{child.locationText || child.track}</p>
+                       </div>
                     </div>
                     {activeChild === child.id && <CheckCircle2 size={24} className="text-green-500" />}
                     {child.id !== 'all' && (
@@ -247,6 +296,47 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
               <span className="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded">Elevated</span>
             </div>
           </div>
+        </div>
+
+        {/* Agenda Card */}
+        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 h-full">
+           <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Calendar size={20} className="text-green-500"/> Today's Agenda
+              </h3>
+              <span className="bg-red-100 text-red-600 text-xs font-black px-2 py-1 rounded animate-pulse flex items-center gap-1"><Radio size={12}/> LIVE</span>
+           </div>
+           
+           <div className="space-y-4">
+              <div className="p-4 bg-green-50 border-2 border-green-500 rounded-2xl shadow-sm relative overflow-hidden">
+                 <div className="flex justify-between items-start mb-2">
+                    <div>
+                       <h4 className="font-black text-gray-900">Structural Mechanics</h4>
+                       <p className="text-xs text-green-700 font-bold">Room 302 • Prof. Sharma</p>
+                    </div>
+                    <span className="text-xs font-bold text-gray-500">10:00 - 11:30 AM</span>
+                 </div>
+                 <div className="mt-4">
+                    <div className="flex justify-between text-xs font-bold text-green-800 mb-1">
+                       <span>45 mins elapsed</span>
+                       <span>45 mins left</span>
+                    </div>
+                    <div className="w-full bg-green-200 rounded-full h-1.5">
+                       <div className="bg-green-500 h-1.5 rounded-full w-[50%]"></div>
+                    </div>
+                 </div>
+              </div>
+              
+              <div className="p-4 border border-gray-100 rounded-2xl opacity-60">
+                 <div className="flex justify-between items-start">
+                    <div>
+                       <h4 className="font-bold text-gray-700">Lunch Break</h4>
+                       <p className="text-xs text-gray-500">Main Cafeteria</p>
+                    </div>
+                    <span className="text-xs font-bold text-gray-400">11:30 - 12:30 PM</span>
+                 </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>
@@ -503,6 +593,24 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
          </div>
       </div>
 
+      {/* Classroom-to-Home Activity Bridge */}
+      <div className="bg-amber-50 rounded-[32px] p-8 shadow-sm border border-amber-200">
+         <div className="flex flex-col md:flex-row gap-6 items-center">
+            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+               <Smile size={32}/>
+            </div>
+            <div className="flex-1">
+               <h3 className="font-bold text-amber-900 text-lg mb-1 flex items-center gap-2">Classroom-to-Home Activity Bridge</h3>
+               <p className="text-amber-800 text-sm leading-relaxed">
+                 <strong>Alex is learning Ratios this week.</strong> Try a 10-minute baking session tonight and let him measure the ingredients! It turns abstract math into a tasty, hands-on experience without needing a textbook.
+               </p>
+            </div>
+            <button className="bg-amber-500 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-amber-600 transition-colors shrink-0 shadow-md">
+               Mark as Completed
+            </button>
+         </div>
+      </div>
+
       {/* AI Language Labs */}
       <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-[32px] p-8 shadow-xl text-white relative overflow-hidden">
          <Volume2 className="absolute right-[-20px] top-[-20px] text-white/5" size={150}/>
@@ -593,6 +701,23 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
 
         {/* Office Hours & Forums */}
         <div className="space-y-8">
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[32px] p-8 shadow-sm text-white relative overflow-hidden">
+             <VideoIcon className="absolute right-6 top-6 text-white/20" size={80} />
+             <div className="relative z-10">
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-2">One-Click "Micro-PTM"</h3>
+                <p className="text-blue-100 text-sm mb-6 max-w-[90%] font-medium">Resolve small issues in 5 minutes via video before they become big problems.</p>
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 mb-4">
+                   <p className="text-xs text-blue-100 uppercase tracking-widest font-bold mb-3">Teacher's Office Hours (Today)</p>
+                   <div className="flex gap-2">
+                      <button className="flex-1 bg-white text-blue-600 font-bold py-2 rounded-lg text-sm hover:bg-blue-50 transition-colors">4:00 PM</button>
+                      <button className="flex-1 bg-white text-blue-600 font-bold py-2 rounded-lg text-sm hover:bg-blue-50 transition-colors">4:15 PM</button>
+                      <button className="flex-1 bg-transparent border border-white/40 text-white font-bold py-2 rounded-lg text-sm hover:bg-white/10 transition-colors">More</button>
+                   </div>
+                </div>
+                <button className="w-full bg-blue-700/50 text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors border border-blue-400/30">Schedule Quick-Sync</button>
+             </div>
+          </div>
+
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-[32px] p-8 shadow-sm text-white relative overflow-hidden">
              <Calendar className="absolute right-6 top-6 text-white/20" size={80} />
              <div className="relative z-10">
@@ -1206,6 +1331,112 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
     </div>
   );
 
+  const renderCampusLife = () => (
+    <div className="space-y-8">
+      <h2 className="text-2xl font-black text-gray-900">Campus Life & Weekly Timetable</h2>
+      <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+         <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2 mb-6">
+           <Calendar size={20} className="text-green-500"/> Alex's Master Timetable
+         </h3>
+         <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[600px]">
+               <thead>
+                  <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                     <th className="p-4 rounded-tl-xl border-b border-gray-100">Time</th>
+                     <th className="p-4 border-b border-gray-100">Monday</th>
+                     <th className="p-4 border-b border-gray-100">Tuesday</th>
+                     <th className="p-4 border-b border-gray-100">Wednesday</th>
+                     <th className="p-4 border-b border-gray-100">Thursday</th>
+                     <th className="p-4 rounded-tr-xl border-b border-gray-100">Friday</th>
+                  </tr>
+               </thead>
+               <tbody className="text-sm">
+                  <tr className="border-b border-gray-100">
+                     <td className="p-4 font-bold text-gray-900">09:00 AM</td>
+                     <td className="p-4"><div className="bg-blue-50 text-blue-700 p-2 rounded-lg font-bold text-xs"><p>Physics</p><p className="font-medium">Room 101</p></div></td>
+                     <td className="p-4"><div className="bg-purple-50 text-purple-700 p-2 rounded-lg font-bold text-xs"><p>Math</p><p className="font-medium">Room 204</p></div></td>
+                     <td className="p-4"><div className="bg-blue-50 text-blue-700 p-2 rounded-lg font-bold text-xs"><p>Physics</p><p className="font-medium">Room 101</p></div></td>
+                     <td className="p-4"><div className="bg-green-50 text-green-700 p-2 rounded-lg font-bold text-xs"><p>Chemistry</p><p className="font-medium">Lab 2</p></div></td>
+                     <td className="p-4"><div className="bg-orange-50 text-orange-700 p-2 rounded-lg font-bold text-xs"><p>English</p><p className="font-medium">Room 305</p></div></td>
+                  </tr>
+                  <tr className="border-b border-gray-100">
+                     <td className="p-4 font-bold text-gray-900">10:00 AM</td>
+                     <td className="p-4"><div className="bg-purple-50 text-purple-700 p-2 rounded-lg font-bold text-xs"><p>Math</p><p className="font-medium">Room 204</p></div></td>
+                     <td className="p-4"><div className="bg-green-50 text-green-700 p-2 rounded-lg font-bold text-xs"><p>Chemistry</p><p className="font-medium">Lab 2</p></div></td>
+                     <td className="p-4"><div className="bg-blue-50 text-blue-700 p-2 rounded-lg font-bold text-xs"><p>Physics</p><p className="font-medium">Room 101</p></div></td>
+                     <td className="p-4 border-2 border-red-400 rounded-lg relative"><div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full -mt-1 -mr-1 animate-ping"></div><div className="bg-red-50 text-red-700 p-2 rounded-lg font-bold text-xs shadow-sm"><p>Struct. Mechanics</p><p className="font-medium">Room 302</p></div></td>
+                     <td className="p-4"><div className="bg-blue-50 text-blue-700 p-2 rounded-lg font-bold text-xs"><p>Physics</p><p className="font-medium">Room 101</p></div></td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+    </div>
+  );
+
+  const renderCollaboration = () => (
+    <div className="space-y-8">
+      <h2 className="text-2xl font-black text-gray-900">Collaboration Hub</h2>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+         {/* Goal Setting Contract */}
+         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2 mb-4">
+              <PenBox size={20} className="text-green-500"/> Collaborative "Goal-Setting" Contract
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">Jointly agree on specific goals for the child to turn complaints into a shared mission.</p>
+            <div className="space-y-4 mb-6">
+               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="w-6 h-6 rounded-full border-2 border-green-500 flex items-center justify-center shrink-0"><CheckCircle2 size={14} className="text-green-500"/></div>
+                  <span className="text-sm font-bold text-gray-700">Improve handwriting in science labs</span>
+               </div>
+               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0"></div>
+                  <span className="text-sm font-bold text-gray-700">Participate in at least one extracurricular club</span>
+               </div>
+               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0"></div>
+                  <span className="text-sm font-bold text-gray-700">Master PCM foundational formulas by Midterms</span>
+               </div>
+            </div>
+            <div className="flex justify-between items-center p-4 bg-green-50 rounded-2xl border border-green-200">
+               <div className="text-sm">
+                  <p className="font-bold text-green-900">Digital Signatures</p>
+                  <p className="text-green-700 mt-1">✓ Term 1 Agreement Pending</p>
+               </div>
+               <button className="bg-green-600 text-white font-bold py-2 px-6 rounded-xl shadow-md hover:bg-green-700 transition-colors">Sign Contract</button>
+            </div>
+         </div>
+
+         {/* Tone-Check AI Assistant */}
+         <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-8 shadow-xl text-white relative overflow-hidden">
+            <Edit3 className="absolute right-[-20px] bottom-[-20px] text-white/5" size={150}/>
+            <div className="relative z-10 flex flex-col h-full">
+               <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                 <Brain size={24} className="text-purple-400"/> AI "Tone-Check" Assistant
+               </h3>
+               <p className="text-gray-400 text-sm mb-6">Maintain professional, supportive communication with teachers.</p>
+               
+               <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
+                  <div>
+                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-2">Your Draft</p>
+                     <p className="text-sm font-medium bg-red-500/10 text-red-200 p-3 rounded-xl border border-red-500/20">"Why did my son get a C?"</p>
+                  </div>
+                  <div>
+                     <p className="text-xs text-green-400 uppercase tracking-widest font-bold mb-2 flex items-center gap-1"><Brain size={12}/> AI Suggestion (Collaborative)</p>
+                     <p className="text-sm font-medium bg-green-500/10 text-green-100 p-3 rounded-xl border border-green-500/30">"I noticed Alex struggled with the recent exam. Could you suggest specific areas for us to practice at home?"</p>
+                  </div>
+               </div>
+               <div className="flex gap-4 mt-6">
+                  <button className="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 shadow-lg transition-colors text-sm">Use Suggestion</button>
+                  <button className="flex-1 bg-transparent border border-gray-600 text-white font-bold py-3 rounded-xl hover:bg-white/10 transition-colors text-sm">Edit Original</button>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch(activeMenuItem) {
       case 'home': return renderHome();
@@ -1214,6 +1445,8 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
       case 'academic': return renderAcademic();
       case 'counselor': return renderCounselor();
       case 'future': return renderFuture();
+      case 'campusLife': return renderCampusLife();
+      case 'collaboration': return renderCollaboration();
       case 'finances': return renderFinances();
       case 'resources': return renderResources();
       case 'productivity': return renderProductivity();
@@ -1324,6 +1557,13 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input type="text" placeholder="Search reports..." className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-green-200 text-sm"/>
             </div>
+
+            <button className="relative p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-full transition-colors group">
+              <MapPin size={20} />
+              <div className="absolute right-0 top-full mt-2 w-max bg-gray-900 text-white text-xs font-bold py-2 px-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-xl z-50">
+                 {typeof activeChild === 'number' ? `Last seen: ${childData.find(c => c.id === activeChild)?.lastSeen || 'Unknown'}` : 'Select a child to view location'}
+              </div>
+            </button>
 
             <button className="relative p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-full transition-colors">
               <Bell size={20} />
