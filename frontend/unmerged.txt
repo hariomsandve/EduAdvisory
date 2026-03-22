@@ -1,0 +1,4 @@
+﻿frontend/src/components/CareerRoadmap.tsx
+frontend/src/components/ParentDashboard.tsx
+frontend/src/components/QuizResult.tsx
+package.json

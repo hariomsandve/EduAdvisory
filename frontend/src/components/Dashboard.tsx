@@ -28,14 +28,19 @@ import HelpFAQ from './HelpFAQ';
 import GamifiedLearning from './GamifiedLearning';
 import CareerPaths from './CareerPaths';
 import FocusFlow from './FocusFlow';
+import ContactUs from './ContactUs';
+import JobPredictor from './JobPredictor';
+import CollegePredictor from './CollegePredictor';
+
 
 interface DashboardProps {
   onNavigate: (view: string) => void;
   onLogout: () => void;
   userName?: string;
+  userEmail?: string;
 }
 
-export default function Dashboard({ onNavigate, onLogout, userName: propUserName }: DashboardProps) {
+export default function Dashboard({ onNavigate, onLogout, userName: propUserName, userEmail }: DashboardProps) {
   const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userName, setUserName] = useState(propUserName || 'User');
@@ -120,6 +125,8 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
     { id: 'resumeBuilder', label: 'Resume Builder', icon: Briefcase },
     { id: 'successStories', label: 'Success Stories', icon: Sparkles },
     { id: 'contactUs', label: 'Contact Us', icon: MessageSquare },
+    { id: 'jobPredictor', label: 'Job Predictor', icon: Briefcase },
+    { id: 'collegePredictor', label: 'College Predictor', icon: GraduationCap },
     { id: 'settings', label: 'Settings', icon: Settings },
     { id: 'logout', label: 'Logout', icon: LogOut },
   ];
@@ -296,9 +303,9 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
             {activeMenuItem === 'profile' ? (
               <UserProfile 
                 userName={userName}
+                userEmail={userEmail}
                 userClass={userClass}
                 userLocation={userLocation}
-                onLogout={onLogout}
               />
             ) : activeMenuItem === 'communityForum' ? (
               <CommunityForum />
@@ -333,17 +340,23 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
             ) : activeMenuItem === 'homeworkAnalyzer' ? (
               <HomeworkAnalyzer />
             ) : activeMenuItem === 'settings' ? (
-              <SettingsComponent userName={userName} />
+              <SettingsComponent />
             ) : activeMenuItem === 'reels' ? (
               <EduReels />
             ) : activeMenuItem === 'helpFAQ' ? (
               <HelpFAQ />
+            ) : activeMenuItem === 'contactUs' ? (
+              <ContactUs />
             ) : activeMenuItem === 'gamifiedLearning' ? (
               <GamifiedLearning />
             ) : activeMenuItem === 'careerPaths' ? (
               <CareerPaths />
             ) : activeMenuItem === 'focusFlow' ? (
               <FocusFlow />
+            ) : activeMenuItem === 'jobPredictor' ? (
+              <JobPredictor />
+            ) : activeMenuItem === 'collegePredictor' ? (
+              <CollegePredictor />
             ) : (
               <>
                 <div className="flex justify-between items-end mb-8">
