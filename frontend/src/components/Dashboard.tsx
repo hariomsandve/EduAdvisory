@@ -29,12 +29,8 @@ import GamifiedLearning from './GamifiedLearning';
 import CareerPaths from './CareerPaths';
 import FocusFlow from './FocusFlow';
 import ContactUs from './ContactUs';
-<<<<<<< HEAD
 import JobPredictor from './JobPredictor';
 import CollegePredictor from './CollegePredictor';
-
-=======
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
 
 interface DashboardProps {
   onNavigate: (view: string) => void;

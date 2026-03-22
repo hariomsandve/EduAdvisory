@@ -21,7 +21,6 @@ const childData = [
   { id: 'all', name: 'Unified View', avatar: 'https://picsum.photos/seed/unified/100/100', track: 'All Children', locationColor: '', locationText: '', lastSeen: '' }
 ];
 
-<<<<<<< HEAD
 const goalsData = [
   { title: 'Aptitude Tests', completed: 3, total: 5, progress: 60, color: 'text-green-500', bg: 'bg-green-500', lightBg: 'bg-green-50' },
   { title: 'Career Prep Sessions', completed: 7, total: 10, progress: 70, color: 'text-green-500', bg: 'bg-green-500', lightBg: 'bg-green-50' },
@@ -37,11 +36,11 @@ const subjectsData = [
     { name: 'Mathematics', tutor: 'Prof. Sharma', time: '10:00 - 11:30 AM', status: 'Upcoming' },
     { name: 'Physics', tutor: 'Ms. Verma', time: '1:00 - 2:00 PM', status: 'Completed' },
     { name: 'Chemistry', tutor: 'Dr. Rao', time: '3:00 - 4:00 PM', status: 'Upcoming' }
-=======
+];
+
 const ahaMoments = [
   { id: 1, student: 'Alex', teacher: 'Dr. Carter', time: '2 hours ago', text: 'Alex finally nailed the bridge stress-test model! Beautiful use of tension distribution.', image: 'https://images.unsplash.com/photo-1541888086425-d81bb19240f5?q=80&w=400&h=200&auto=format&fit=crop' },
   { id: 2, student: 'Sarah', teacher: 'Mr. Davis', time: '4 hours ago', text: 'Great presentation on the Solar System. The class loved the visuals!', image: 'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=400&h=200&auto=format&fit=crop' }
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
 ];
 
 const weeklyProgressData = [
@@ -1494,11 +1493,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 exit={{ opacity: 0, width: 0 }}
                 className="text-xl font-bold tracking-tight whitespace-nowrap overflow-hidden"
               >
-<<<<<<< HEAD
-                Edu-<span className="text-green-500">Parent</span>
-=======
                 Edu-<span className="text-green-600">Parent</span>
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
               </motion.span>
             )}
           </AnimatePresence>
@@ -1580,16 +1575,12 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
               <input type="text" placeholder="Search reports..." className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-green-200 text-sm"/>
             </div>
 
-<<<<<<< HEAD
-=======
             <button className="relative p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-full transition-colors group">
               <MapPin size={20} />
               <div className="absolute right-0 top-full mt-2 w-max bg-gray-900 text-white text-xs font-bold py-2 px-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-xl z-50">
                  {typeof activeChild === 'number' ? `Last seen: ${childData.find(c => c.id === activeChild)?.lastSeen || 'Unknown'}` : 'Select a child to view location'}
               </div>
             </button>
-
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
             <button className="relative p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-full transition-colors">
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
@@ -1602,11 +1593,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 <p className="font-bold text-sm text-gray-900">{userName}</p>
                 <p className="text-xs text-gray-500 font-medium">Guardian Account</p>
               </div>
-<<<<<<< HEAD
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-green-400 flex items-center justify-center text-white font-bold shadow-md border-2 border-white">
-=======
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-500 to-emerald-400 flex items-center justify-center text-white font-bold shadow-md border-2 border-white">
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
                 {userName.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -1615,202 +1602,6 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
 
         {/* Scrollable Dashboard Body */}
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 scroll-smooth">
-<<<<<<< HEAD
-          <div className="max-w-7xl mx-auto space-y-8">
-            
-            {/* Child Selector & Welcome Card */}
-            <div className="flex flex-col xl:flex-row gap-8">
-              {/* Welcome */}
-              <div className="bg-gradient-to-r from-green-500 to-green-600 flex-1 text-white rounded-[32px] p-8 lg:p-10 shadow-xl shadow-green-500/20 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                <div className="relative z-10 h-full flex flex-col justify-center">
-                  <h2 className="text-3xl lg:text-4xl font-black mb-3 text-white">Hello, {userName}!</h2>
-                  <p className="text-green-100 text-lg flex items-center gap-2 mb-6 max-w-md">
-                    Stay intimately connected with your child's academic progress and career roadmap.
-                  </p>
-                  <div className="flex gap-4">
-                     <button className="bg-white text-green-600 px-6 py-2.5 rounded-xl font-bold shadow-lg flex items-center gap-2 hover:bg-green-50 transition-colors">
-                        <Users size={18} /> Book Counselor
-                     </button>
-                     <button className="bg-green-600 border border-green-400 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition-colors hidden sm:block">
-                        View Detailed Report
-                     </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Child Profile Cards */}
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 shrink-0 w-full xl:w-[350px]">
-                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      <Target size={20} className="text-green-500"/> Select Child Profile
-                    </h3>
-                    <button className="p-1.5 bg-gray-50 text-gray-500 rounded-lg hover:text-green-600"><Plus size={18}/></button>
-                 </div>
-                 
-                 <div className="space-y-4">
-                    {childData.map((child) => (
-                       <div 
-                          key={child.id}
-                          onClick={() => setActiveChild(child.id)}
-                          className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border-2 ${activeChild === child.id ? 'border-green-500 bg-green-50/50 shadow-md' : 'border-transparent bg-gray-50 hover:bg-gray-100'}`}
-                       >
-                          <img src={child.avatar} alt="child" className="w-14 h-14 rounded-full border-2 border-white shadow-sm" />
-                          <div>
-                             <p className="font-bold text-gray-900 text-lg">{child.name}</p>
-                             <div className="flex gap-2 text-xs mt-1">
-                                <span className="bg-white px-2 py-0.5 rounded text-gray-600">Avg Grade: A</span>
-                                <span className="bg-white px-2 py-0.5 rounded text-gray-600">Track: PCM</span>
-                             </div>
-                          </div>
-                          {activeChild === child.id && <CheckCircle2 size={24} className="text-green-500 ml-auto" />}
-                       </div>
-                    ))}
-                 </div>
-              </div>
-            </div>
-
-            {/* Grid Stats Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
-              <div className="lg:col-span-2 space-y-8">
-                {/* Academic Goals Tracker */}
-                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-gray-900">Weekly Milestones</h2>
-                    <span className="text-sm font-bold text-green-500 bg-green-50 px-3 py-1 rounded-lg">This Week</span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {goalsData.map((goal, index) => (
-                      <div key={index} className={`p-5 rounded-3xl border border-gray-100 ${goal.lightBg}`}>
-                        <div className="flex justify-between items-start mb-4">
-                           <div className={`p-2 bg-white rounded-xl shadow-sm ${goal.color}`}>
-                              <BookMarked size={20} />
-                           </div>
-                           <CircularProgress progress={goal.progress} barColor={goal.color} />
-                        </div>
-                        <p className="font-bold text-gray-900 mt-2">{goal.title}</p>
-                        <p className="text-sm text-gray-500 mt-1">{goal.completed} of {goal.total} tasks completed</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Progress Chart */}
-                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
-                   <div className="flex justify-between items-center mb-8">
-                     <h2 className="text-xl font-bold text-gray-900">Study Hours & Focus Score</h2>
-                     <button className="text-sm text-gray-500 hover:text-green-600 font-medium">Export Data</button>
-                   </div>
-                   <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={weeklyProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
-                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
-                        <Tooltip 
-                          contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                          cursor={{ stroke: '#22c55e', strokeWidth: 1, strokeDasharray: '3 3' }}
-                        />
-                        <Area type="monotone" dataKey="hours" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorHours)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                   </div>
-                </div>
-
-                {/* Recommended Tutors */}
-                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">Expert Recommendations</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {recommendedTutors.map((tutor, index) => (
-                      <div key={index} className="p-5 border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-md transition-all rounded-2xl group">
-                        <div className="flex gap-4">
-                          <img src={tutor.avatar} alt="Tutor" className="w-14 h-14 rounded-full border border-gray-200" />
-                          <div className="flex-1">
-                              <div className="flex justify-between">
-                                 <p className="font-bold text-gray-900">{tutor.subject}</p>
-                                 <span className="flex items-center text-xs font-bold text-yellow-500 bg-yellow-50 px-1.5 py-0.5 rounded"><Star size={12} className="mr-0.5 fill-yellow-500"/> {tutor.rating}</span>
-                              </div>
-                              <p className="text-sm text-gray-500 mt-0.5">{tutor.tutor} • {tutor.target}</p>
-                              
-                              <div className="flex gap-2 mt-4">
-                                <button className="flex-1 bg-white border border-gray-200 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:border-gray-300">View Profile</button>
-                                <button className="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold hover:bg-green-600">Connect</button>
-                              </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Sidebar widgets */}
-              <div className="space-y-8">
-                {/* Upcoming Schedule */}
-                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
-                   <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-bold text-gray-900">Agenda</h2>
-                      <div className="flex space-x-1">
-                          <button className="p-1 bg-gray-50 text-gray-400 rounded-lg hover:text-gray-900"><ChevronLeft size={20}/></button>
-                          <button className="p-1 bg-gray-50 text-gray-400 rounded-lg hover:text-gray-900"><ChevronRight size={20}/></button>
-                      </div>
-                   </div>
-                   
-                   <div className="space-y-4">
-                     {upcomingEvents.map((event, index) => (
-                       <div key={index} className="flex gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-green-200 transition-colors cursor-pointer group">
-                          <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 ${event.type === 'meeting' ? 'bg-green-100 text-green-600' : event.type === 'test' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
-                             <span className="text-xs font-bold uppercase">{event.date.split(' ')[0]}</span>
-                             <span className="text-lg font-black">{event.date.split(' ')[1] || 'TMR'}</span>
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 group-hover:text-green-600 transition-colors">{event.title}</p>
-                            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
-                              <Calendar size={14}/> {event.time}
-                            </p>
-                          </div>
-                       </div>
-                     ))}
-                   </div>
-                   
-                   <button className="w-full mt-6 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-green-300 hover:text-green-500 transition-all flex items-center justify-center gap-2">
-                     <Plus size={18}/> Schedule Meeting
-                   </button>
-                </div>
-
-                {/* Subject Monitoring */}
-                <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-8 shadow-xl text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="flex justify-between items-center mb-6 relative z-10">
-                      <h2 className="text-xl font-bold">Class Monitoring</h2>
-                      <Brain className="text-green-400" size={24}/>
-                    </div>
-                    
-                    <div className="space-y-4 relative z-10">
-                        {subjectsData.map((subject, index) => (
-                            <div key={index} className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors cursor-pointer">
-                                <div>
-                                    <p className="font-bold text-white text-sm">{subject.name}</p>
-                                    <p className="text-xs text-gray-400 mt-0.5">{subject.tutor} • {subject.time}</p>
-                                </div>
-                                <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ${subject.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 'bg-green-500/20 text-green-400'}`}>
-                                  {subject.status}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-              </div>
-            </div>
-            
-=======
           <div className="max-w-7xl mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
@@ -1823,7 +1614,6 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
                 {renderContent()}
               </motion.div>
             </AnimatePresence>
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
           </div>
         </main>
       </div>

@@ -296,11 +296,7 @@ export default function Settings() {
                      initial={{ opacity: 0, x: 40 }}
                      animate={{ opacity: 1, x: 0 }}
                      exit={{ opacity: 0, x: -40 }}
-<<<<<<< HEAD
                      transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-=======
-                     transition={{ duration: 0.5, cubicBezier: [0.23, 1, 0.32, 1] }}
->>>>>>> 0285e45c0caac0d941674d1aad2c64c884823936
                   >
 
                      {/* SECTION 1: PROFILE */}
