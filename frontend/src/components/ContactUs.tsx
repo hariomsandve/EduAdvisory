@@ -61,6 +61,7 @@ export default function ContactUs() {
     { id: 1, type: 'ai', text: 'Hello! I am your AI Career Assistant. How can I help you today?' }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const faqs = [
     { question: "How do I start my career roadmap?", answer: "Go to the 'Career Roadmaps' section in your dashboard, select your field of interest, and our AI will generate a personalized path based on your current skills." },
@@ -261,61 +262,7 @@ export default function ContactUs() {
         {/* Right Column: AI Chat & Contact Info */}
         <div className="lg:col-span-4 space-y-10">
           
-          {/* AI Chat Assistant Widget */}
-          <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 flex flex-col h-[500px] overflow-hidden sticky top-10">
-             <div className="bg-orange-700 p-6 text-white shrink-0">
-                <div className="flex items-center gap-4">
-                   <div className="relative">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                         <MessageCircle size={24} />
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-orange-400 border-2 border-orange-700 rounded-full"></div>
-                   </div>
-                   <div>
-                      <h4 className="font-extrabold text-sm tracking-tight">AI Assistant</h4>
-                      <p className="text-[10px] text-orange-200 font-bold uppercase tracking-widest">Always Online</p>
-                   </div>
-                </div>
-             </div>
-             
-             <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
-                {chatMessages.map((msg) => (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    key={msg.id} 
-                    className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-[13px] font-medium shadow-sm leading-relaxed ${
-                      msg.type === 'user' 
-                        ? 'bg-orange-600 text-white rounded-tr-none' 
-                        : 'bg-gray-100 text-gray-700 rounded-tl-none border border-gray-200/50'
-                    }`}>
-                      {msg.text}
-                    </div>
-                  </motion.div>
-                ))}
-             </div>
-
-             <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-                <div className="relative">
-                   <input 
-                    type="text" 
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
-                    placeholder="Ask AI anything..."
-                    className="w-full pl-5 pr-12 py-4 bg-white border border-gray-200 rounded-2xl text-[13px] font-bold outline-none focus:border-orange-500 transition-all shadow-sm"
-                   />
-                   <button 
-                    onClick={handleChatSend}
-                    className="absolute right-2 top-2 w-10 h-10 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-700 transition-colors shadow-md"
-                   >
-                      <Send size={16} />
-                   </button>
-                </div>
-             </div>
-          </div>
+          {/* AI Chat Assistant Widget Removed from Grid */}
 
           {/* Direct Contact Options */}
           <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100">
@@ -365,6 +312,90 @@ export default function ContactUs() {
           </div>
 
         </div>
+      </div>
+
+      {/* Floating AI Assistant */}
+      <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-4">
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2rem] shadow-3xl border border-gray-100 flex flex-col w-[320px] h-[450px] overflow-hidden mb-2"
+            >
+              <div className="bg-orange-700 p-4 text-white shrink-0 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
+                      <MessageCircle size={20} />
+                   </div>
+                   <div>
+                      <h4 className="font-extrabold text-xs tracking-tight">AI Assistant</h4>
+                      <p className="text-[9px] text-orange-200 font-bold uppercase tracking-widest">Active Now</p>
+                   </div>
+                </div>
+                <button onClick={() => setIsChatOpen(false)} className="hover:bg-white/10 p-1.5 rounded-lg transition-colors">
+                  <ChevronDown size={20} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-gray-50/30">
+                 {chatMessages.map((msg) => (
+                   <motion.div 
+                     initial={{ opacity: 0, x: msg.type === 'user' ? 10 : -10 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     key={msg.id} 
+                     className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                   >
+                     <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[12px] font-medium shadow-sm leading-relaxed ${
+                       msg.type === 'user' 
+                         ? 'bg-orange-600 text-white rounded-tr-none' 
+                         : 'bg-white text-gray-700 rounded-tl-none border border-gray-100'
+                     }`}>
+                       {msg.text}
+                     </div>
+                   </motion.div>
+                 ))}
+              </div>
+
+              <div className="p-3 border-t border-gray-100 bg-white">
+                 <div className="relative">
+                    <input 
+                     type="text" 
+                     value={chatInput}
+                     onChange={(e) => setChatInput(e.target.value)}
+                     onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
+                     placeholder="Ask me anything..."
+                     className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-[12px] font-bold outline-none focus:border-orange-500 transition-all"
+                    />
+                    <button 
+                     onClick={handleChatSend}
+                     className="absolute right-1.5 top-1.5 w-7 h-7 bg-orange-600 text-white rounded-lg flex items-center justify-center hover:bg-orange-700 transition-colors shadow-md"
+                    >
+                       <Send size={12} />
+                    </button>
+                 </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white transition-all ${
+            isChatOpen ? 'bg-orange-800' : 'bg-orange-600 hover:bg-orange-700'
+          }`}
+        >
+          {isChatOpen ? <ChevronDown size={32} /> : <MessageCircle size={32} />}
+          {!isChatOpen && (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-orange-500"></span>
+            </span>
+          )}
+        </motion.button>
       </div>
     </div>
   );
