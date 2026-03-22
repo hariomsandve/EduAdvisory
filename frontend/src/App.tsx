@@ -10,12 +10,13 @@ import RoleSelection, { UserRole } from './components/RoleSelection';
 import InterestSelection from './components/InterestSelection';
 import CareerQuiz from './components/CareerQuiz';
 import AuthPage from './components/AuthPage';
+import ParentAuthPage from './components/ParentAuthPage';
 import Dashboard from './components/Dashboard'; // ✅ FIXED IMPORT
 import ParentDashboard from './components/ParentDashboard';
 import QuizResult from './components/QuizResult';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppView = 'loading' | 'landing' | 'roleSelection' | 'interestSelection' | 'careerQuiz' | 'auth' | 'dashboard' | 'quizResult';
+type AppView = 'loading' | 'landing' | 'roleSelection' | 'interestSelection' | 'careerQuiz' | 'auth' | 'parentAuth' | 'dashboard' | 'quizResult';
 
 export default function App() {
   const [view, setView] = useState<AppView>('loading');
@@ -24,6 +25,7 @@ export default function App() {
   const [flowSource, setFlowSource] = useState<'normal' | 'signup'>('normal');
   const [userData, setUserData] = useState<{ 
     userName?: string;
+    userEmail?: string;
     selectedClass?: string; 
     selectedInterests?: string[];
     quizCompleted?: boolean;
@@ -39,7 +41,11 @@ export default function App() {
     setRole(selectedRole);
     setAuthMode('signup');
     setFlowSource('signup');
-    setView('auth');
+    if (selectedRole === 'parent') {
+      setView('parentAuth');
+    } else {
+      setView('auth');
+    }
   };
 
   const handleInterestComplete = (data: { selectedClass: string; selectedInterests: string[] }) => {
@@ -87,9 +93,11 @@ export default function App() {
       }
     }
 
-    if (currentUserName) {
-      setUserData(prev => ({ ...prev, userName: currentUserName }));
-    }
+    setUserData(prev => ({ 
+      ...prev, 
+      userName: currentUserName || prev.userName,
+      userEmail: data.email 
+    }));
     
     if (role === 'parent' || mode === 'login') {
       setView('dashboard');
@@ -152,6 +160,22 @@ export default function App() {
           </motion.div>
         )}
 
+        {view === 'parentAuth' && (
+          <motion.div
+            key="parentAuth"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ParentAuthPage 
+              initialMode={authMode}
+              onBack={() => setView('roleSelection')}
+              onSuccess={handleAuthSuccess}
+            />
+          </motion.div>
+        )}
+
         {view === 'roleSelection' && (
           <motion.div
             key="roleSelection"
@@ -205,7 +229,6 @@ export default function App() {
             transition={{ duration: 0.5 }}
           >
             <QuizResult 
-              userData={userData}
               onDashboard={() => setView('dashboard')}
               onRetake={() => setView('careerQuiz')}
             />
@@ -231,6 +254,7 @@ export default function App() {
                 onNavigate={(view) => setView(view as AppView)}  
                 onLogout={handleLogout} 
                 userName={userData.userName} 
+                userEmail={userData.userEmail}
               />
             )}
           </motion.div>
