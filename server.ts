@@ -175,10 +175,10 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    // Serve static files in production
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    // Serve static files in production (built to frontend/dist)
+    app.use(express.static(path.resolve(__dirname, 'frontend', 'dist')));
     app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
     });
   }
 
