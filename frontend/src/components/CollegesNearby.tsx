@@ -1,24 +1,17 @@
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, MapPin, Building2, GraduationCap, Navigation, 
-  Phone, Globe, Star, ChevronRight, Layers
+  Globe, Star, Layers, Volume2, Bot, ExternalLink, Trophy,
+  ChevronLeft, Sparkles, Loader2, VolumeX
 } from 'lucide-react';
-import L from 'leaflet';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Fix for default marker icon
-const icon = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
-const iconShadow = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+// Declare global Window interface to support dynamic Leaflet loading
+declare global {
+  interface Window {
+    L: any;
+  }
+}
 
 interface College {
   id: number;
@@ -31,121 +24,218 @@ interface College {
   lat: number;
   lng: number;
   image: string;
+  description?: string;
+  nirfRank?: number;
 }
 
-// Component to update map center
-function MapUpdater({ center }: { center: [number, number] }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
+interface MapProps {
+  colleges: College[];
+  selectedCollege: College | null;
+  onMarkerClick: (college: College) => void;
+  mapCenter: [number, number];
 }
+
+// Custom Map Component that dynamically loads Leaflet to avoid build errors
+const LiveMap = ({ colleges, selectedCollege, onMarkerClick, mapCenter }: MapProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<any>(null);
+  const markersLayer = useRef<any>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initMap = () => {
+      if (!mapRef.current || mapInstance.current || !window.L) return;
+      
+      const L = window.L;
+      const map = L.map(mapRef.current, { zoomControl: false }).setView(mapCenter, 13);
+      mapInstance.current = map;
+
+      // Add a clean, modern map tile layer
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Reposition zoom controls
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      markersLayer.current = L.featureGroup().addTo(map);
+      renderMarkers();
+    };
+
+    // Dynamically load Leaflet CSS and JS if not already present
+    if (window.L) {
+      initMap();
+    } else {
+      if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      if (!document.getElementById('leaflet-js')) {
+        const script = document.createElement('script');
+        script.id = 'leaflet-js';
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.async = true;
+        script.onload = () => {
+          if (isMounted) initMap();
+        };
+        document.head.appendChild(script);
+      } else {
+        const script = document.getElementById('leaflet-js');
+        script?.addEventListener('load', initMap);
+      }
+    }
+
+    return () => {
+      isMounted = false;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    };
+  }, []);
+
+  const renderMarkers = () => {
+    if (!mapInstance.current || !markersLayer.current || !window.L) return;
+    
+    const L = window.L;
+    markersLayer.current.clearLayers();
+
+    colleges.forEach((college) => {
+      const isSelected = selectedCollege?.id === college.id;
+      
+      const markerHtml = `
+        <div style="background-color: ${isSelected ? '#f97316' : '#4f46e5'}; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; color: white; transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'}; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+      `;
+
+      const customIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: markerHtml,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      });
+
+      const marker = L.marker([college.lat, college.lng], { icon: customIcon });
+      
+      // Add hover popup
+      marker.bindPopup(`
+        <div style="text-align: center; padding: 4px; min-width: 120px;">
+          <h3 style="font-weight: 900; font-size: 13px; margin: 0 0 4px 0; color: #0f172a; line-height: 1.2;">${college.name}</h3>
+          <span style="font-size: 10px; font-weight: 800; color: #ea580c; background: #ffedd5; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">${college.category}</span>
+        </div>
+      `, { closeButton: false, offset: [0, -10] });
+
+      marker.on('click', () => onMarkerClick(college));
+      marker.on('mouseover', function(this: any) { this.openPopup(); });
+      marker.on('mouseout', function(this: any) { if (!isSelected) this.closePopup(); });
+
+      markersLayer.current.addLayer(marker);
+      
+      if (isSelected) {
+        marker.openPopup();
+      }
+    });
+  };
+
+  useEffect(() => {
+    renderMarkers();
+  }, [colleges, selectedCollege]);
+
+  useEffect(() => {
+    if (mapInstance.current && window.L && selectedCollege) {
+      mapInstance.current.flyTo(mapCenter, 15, { 
+        duration: 1.5,
+        easeLinearity: 0.25
+      });
+    }
+  }, [mapCenter]);
+
+  return <div ref={mapRef} className="w-full h-full z-0 bg-slate-50" />;
+};
 
 export default function CollegesNearby() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.5204, 73.8567]); // Pune coordinates
+  
+  // Interactive States
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
 
-  const colleges: College[] = [
-  // ==========================================
-  // 1. UNIVERSITIES (STATE, DEEMED, PRIVATE)
-  // ==========================================
-  { id: 1, name: 'Savitribai Phule Pune University', type: 'Government', category: 'State University', address: 'Ganeshkhind, Pune', rating: 4.7, distance: '4.5 km', lat: 18.5531, lng: 73.8245, image: 'https://picsum.photos/seed/sppu/100/100' },
-  { id: 2, name: 'Bharati Vidyapeeth', type: 'Private', category: 'Deemed University', address: 'LBS Road, Pune', rating: 4.3, distance: '9.2 km', lat: 18.4575, lng: 73.8508, image: 'https://picsum.photos/seed/bharati/100/100' },
-  { id: 3, name: 'Deccan College Post-Graduate and Research Institute', type: 'Government', category: 'Deemed University', address: 'Yerawada, Pune', rating: 4.5, distance: '6.0 km', lat: 18.5417, lng: 73.8767, image: 'https://picsum.photos/seed/deccan/100/100' },
-  { id: 4, name: 'Defence Institute of Advanced Technology', type: 'Government', category: 'Deemed University', address: 'Girinagar, Pune', rating: 4.6, distance: '14.0 km', lat: 18.4417, lng: 73.7667, image: 'https://picsum.photos/seed/diat/100/100' },
-  { id: 5, name: 'Dnyaneshwar Vidyapeeth', type: 'Private', category: 'Deemed University', address: 'Pune', rating: 4.0, distance: '5.0 km', lat: 18.5204, lng: 73.8567, image: 'https://picsum.photos/seed/dnyan/100/100' },
-  { id: 6, name: 'Gokhale Institute of Politics and Economics', type: 'Private', category: 'Deemed University', address: 'BMCC Road, Pune', rating: 4.6, distance: '3.5 km', lat: 18.5230, lng: 73.8340, image: 'https://picsum.photos/seed/gokhale/100/100' },
-  { id: 7, name: 'Indian Institute of Information Technology (IIIT), Pune', type: 'Government', category: 'Deemed University', address: 'Ambegaon, Pune', rating: 4.4, distance: '11.0 km', lat: 18.4500, lng: 73.8500, image: 'https://picsum.photos/seed/iiit/100/100' },
-  { id: 8, name: 'Indian Institute of Science Education and Research (IISER)', type: 'Government', category: 'Deemed University', address: 'Pashan, Pune', rating: 4.8, distance: '7.5 km', lat: 18.5480, lng: 73.8050, image: 'https://picsum.photos/seed/iiser/100/100' },
-  { id: 9, name: 'Christ University Pune Lavasa Campus', type: 'Private', category: 'Private University', address: 'Lavasa, Pune', rating: 4.5, distance: '55.0 km', lat: 18.4110, lng: 73.5070, image: 'https://picsum.photos/seed/christ/100/100' },
-  { id: 10, name: 'National Institute of Construction Management and Research', type: 'Private', category: 'Deemed University', address: 'Balewadi, Pune', rating: 4.4, distance: '10.2 km', lat: 18.5660, lng: 73.7780, image: 'https://picsum.photos/seed/nicmar/100/100' },
-  { id: 11, name: 'National Defence Academy (NDA)', type: 'Government', category: 'Defence', address: 'Khadakwasla, Pune', rating: 4.9, distance: '15.0 km', lat: 18.4328, lng: 73.7431, image: 'https://picsum.photos/seed/nda/100/100' },
-  { id: 12, name: 'Tilak Maharashtra University', type: 'Private', category: 'Deemed University', address: 'Gultekdi, Pune', rating: 4.1, distance: '5.5 km', lat: 18.4980, lng: 73.8650, image: 'https://picsum.photos/seed/tmu/100/100' },
-  { id: 13, name: 'Spicer Adventist University', type: 'Private', category: 'Private University', address: 'Aundh, Pune', rating: 4.2, distance: '6.8 km', lat: 18.5600, lng: 73.8100, image: 'https://picsum.photos/seed/spicer/100/100' },
-  { id: 14, name: 'Symbiosis International University', type: 'Private', category: 'Private University', address: 'Lavale, Pune', rating: 4.6, distance: '14.2 km', lat: 18.5492, lng: 73.9261, image: 'https://picsum.photos/seed/symbiosis/100/100' },
-  { id: 15, name: 'Ajeenkya DY Patil University', type: 'Private', category: 'Private University', address: 'Lohegaon, Pune', rating: 4.2, distance: '16.5 km', lat: 18.6180, lng: 73.9180, image: 'https://picsum.photos/seed/adypu/100/100' },
-  { id: 16, name: 'Dr. D Y Patil Dnyan Prasad University', type: 'Private', category: 'Private University', address: 'Pimpri, Pune', rating: 4.3, distance: '14.0 km', lat: 18.6210, lng: 73.8150, image: 'https://picsum.photos/seed/dypu/100/100' },
-  { id: 17, name: 'Dr. P.A. Inamdar University', type: 'Private', category: 'Private University', address: 'Camp, Pune', rating: 4.2, distance: '3.0 km', lat: 18.5100, lng: 73.8800, image: 'https://picsum.photos/seed/inamdar/100/100' },
-  { id: 18, name: 'MIT World Peace University', type: 'Private', category: 'Private University', address: 'Kothrud, Pune', rating: 4.4, distance: '6.5 km', lat: 18.5186, lng: 73.8151, image: 'https://picsum.photos/seed/mitwpu/100/100' },
-  { id: 19, name: 'MIT Art, Design and Technology University', type: 'Private', category: 'Private University', address: 'Loni Kalbhor, Pune', rating: 4.5, distance: '22.0 km', lat: 18.4900, lng: 74.0200, image: 'https://picsum.photos/seed/mitadt/100/100' },
-  { id: 20, name: 'Symbiosis Skills and Professional University', type: 'Private', category: 'Private University', address: 'Kiwale, Pune', rating: 4.3, distance: '24.0 km', lat: 18.6400, lng: 73.7400, image: 'https://picsum.photos/seed/sspu/100/100' },
-  { id: 21, name: 'Vishwakarma University', type: 'Private', category: 'Private University', address: 'Kondhwa, Pune', rating: 4.2, distance: '10.5 km', lat: 18.4550, lng: 73.8850, image: 'https://picsum.photos/seed/vu/100/100' },
-  { id: 22, name: 'G H Raisoni International Skill Tech University', type: 'Private', category: 'Private University', address: 'Wagholi, Pune', rating: 4.1, distance: '18.0 km', lat: 18.5800, lng: 73.9800, image: 'https://picsum.photos/seed/raisoni/100/100' },
-  { id: 23, name: 'ALARD University Pune', type: 'Private', category: 'Private University', address: 'Hinjewadi, Pune', rating: 4.0, distance: '19.5 km', lat: 18.5900, lng: 73.7200, image: 'https://picsum.photos/seed/alard/100/100' },
+  const apiKey = ""; // Provided by execution environment
+  const userApiKey = "AIzaSyDnqav9Rf-6l-7p8s0VDF0ue4wpGKjmj1M"; // Personal key fallback requested by user
 
-  // ==========================================
-  // 2. ENGINEERING & TECHNOLOGY
-  // ==========================================
-  { id: 24, name: 'Indian Institute of Tropical Meteorology', type: 'Government', category: 'Research/Tech', address: 'Pashan, Pune', rating: 4.8, distance: '7.8 km', lat: 18.5400, lng: 73.8050, image: 'https://picsum.photos/seed/iitm/100/100' },
-  { id: 25, name: 'College of Agriculture Pune', type: 'Government', category: 'Agriculture', address: 'Shivajinagar, Pune', rating: 4.5, distance: '1.8 km', lat: 18.5306, lng: 73.8490, image: 'https://picsum.photos/seed/agri/100/100' },
-  { id: 26, name: 'College of Engineering Pune (COEP)', type: 'Government', category: 'Engineering', address: 'Shivajinagar, Pune', rating: 4.8, distance: '2.5 km', lat: 18.5293, lng: 73.8565, image: 'https://picsum.photos/seed/coep/100/100' },
-  { id: 27, name: 'Government College of Eng. & Research, Avasari', type: 'Government', category: 'Engineering', address: 'Avasari Khurd, Pune', rating: 4.1, distance: '45.0 km', lat: 18.9900, lng: 73.9600, image: 'https://picsum.photos/seed/gcoea/100/100' },
-  { id: 28, name: 'Government Polytechnic Pune', type: 'Government', category: 'Polytechnic', address: 'Shivajinagar, Pune', rating: 4.4, distance: '2.1 km', lat: 18.5323, lng: 73.8437, image: 'https://picsum.photos/seed/gpp/100/100' },
-  { id: 29, name: 'Abeda Inamdar Senior College (AISC)', type: 'Private', category: 'Autonomous', address: 'Camp, Pune', rating: 4.3, distance: '3.2 km', lat: 18.5100, lng: 73.8810, image: 'https://picsum.photos/seed/aisc/100/100' },
-  { id: 30, name: 'Maharashtra Academy of Engineering', type: 'Private', category: 'Autonomous', address: 'Alandi, Pune', rating: 4.2, distance: '21.0 km', lat: 18.6750, lng: 73.8900, image: 'https://picsum.photos/seed/mae/100/100' },
-  { id: 31, name: 'MKSSS Cummins College of Engineering for Women', type: 'Private', category: 'Autonomous', address: 'Karve Nagar, Pune', rating: 4.6, distance: '7.1 km', lat: 18.4897, lng: 73.8143, image: 'https://picsum.photos/seed/cummins/100/100' },
-  { id: 32, name: 'Pimpri Chinchwad College of Engineering (PCCOE)', type: 'Private', category: 'Autonomous', address: 'Nigdi, Pune', rating: 4.6, distance: '18.5 km', lat: 18.6508, lng: 73.7634, image: 'https://picsum.photos/seed/pccoe/100/100' },
-  { id: 33, name: 'Vishwakarma Institute of Information Technology (VIIT)', type: 'Private', category: 'Autonomous', address: 'Kondhwa, Pune', rating: 4.4, distance: '11.2 km', lat: 18.4600, lng: 73.8800, image: 'https://picsum.photos/seed/viit/100/100' },
-  { id: 34, name: 'Vishwakarma Institute of Technology (VIT)', type: 'Private', category: 'Autonomous', address: 'Bibwewadi, Pune', rating: 4.5, distance: '8.1 km', lat: 18.4700, lng: 73.8600, image: 'https://picsum.photos/seed/vit/100/100' },
-  { id: 35, name: 'Sanjeevani Group of Institutes', type: 'Private', category: 'Engineering', address: 'Pune', rating: 4.1, distance: '10.0 km', lat: 18.5200, lng: 73.8500, image: 'https://picsum.photos/seed/sanjeevani/100/100' },
-  { id: 36, name: 'AISSMS College of Engineering', type: 'Private', category: 'Engineering', address: 'Kennedy Road, Pune', rating: 4.2, distance: '2.8 km', lat: 18.5300, lng: 73.8600, image: 'https://picsum.photos/seed/aissms/100/100' },
-  { id: 37, name: 'Army Institute of Technology (AIT)', type: 'Private', category: 'Engineering', address: 'Dighi Hills, Pune', rating: 4.7, distance: '12.5 km', lat: 18.6068, lng: 73.9131, image: 'https://picsum.photos/seed/ait/100/100' },
-  { id: 38, name: 'College of Military Engineering (CME)', type: 'Government', category: 'Engineering', address: 'Dapodi, Pune', rating: 4.8, distance: '8.5 km', lat: 18.5800, lng: 73.8300, image: 'https://picsum.photos/seed/cme/100/100' },
-  { id: 39, name: 'Dhole Patil College of Engineering', type: 'Private', category: 'Engineering', address: 'Wagholi, Pune', rating: 4.0, distance: '16.2 km', lat: 18.5700, lng: 73.9700, image: 'https://picsum.photos/seed/dhole/100/100' },
-  { id: 40, name: 'International Institute of Information Technology (I2IT)', type: 'Private', category: 'Engineering', address: 'Hinjewadi, Pune', rating: 4.3, distance: '19.0 km', lat: 18.5900, lng: 73.7400, image: 'https://picsum.photos/seed/i2it/100/100' },
-  { id: 41, name: 'Pune Institute of Computer Technology (PICT)', type: 'Private', category: 'Engineering', address: 'Dhankawadi, Pune', rating: 4.7, distance: '8.4 km', lat: 18.4604, lng: 73.8580, image: 'https://picsum.photos/seed/pict/100/100' },
-  { id: 42, name: 'Trinity Academy of Engineering', type: 'Private', category: 'Engineering', address: 'Kondhwa, Pune', rating: 4.1, distance: '12.0 km', lat: 18.4400, lng: 73.8900, image: 'https://picsum.photos/seed/trinity/100/100' },
+  const fetchGeminiInsight = async (college: College) => {
+    const prompt = `You are an expert educational counselor. Provide a professional, highly insightful 3-sentence summary of ${college.name} (${college.category}) located in ${college.address}. Highlight its reputation, typical placements, and notable strengths.`;
+    
+    let retries = 5;
+    let delay = 1000;
+    let lastError = "Unable to connect to AI.";
+    
+    // Prioritize the user's provided API key to bypass environment limits
+    const activeKey = userApiKey || apiKey;
+    
+    while (retries > 0) {
+      try {
+        // Changed to use gemini-1.5-pro (Gemini Pro) as requested
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${activeKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP Error ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "No insights available from the model.";
+      } catch (error: any) {
+        lastError = error.message;
+        retries--;
+        if (retries === 0) return `Failed to load AI insights: ${lastError}`;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+    }
+    return lastError;
+  };
 
-  // ==========================================
-  // 3. MANAGEMENT & COMMERCE
-  // ==========================================
-  { id: 43, name: 'PUMBA (Dept of Management Sciences)', type: 'Government', category: 'Management', address: 'SPPU Campus, Pune', rating: 4.5, distance: '4.5 km', lat: 18.5531, lng: 73.8245, image: 'https://picsum.photos/seed/pumba/100/100' },
-  { id: 44, name: 'Institute of Management Development and Research', type: 'Private', category: 'Management', address: 'BMCC Road, Pune', rating: 4.4, distance: '3.6 km', lat: 18.5200, lng: 73.8350, image: 'https://picsum.photos/seed/imdr/100/100' },
-  { id: 45, name: 'National Institute of Bank Management (NIBM)', type: 'Government', category: 'Management', address: 'Kondhwa, Pune', rating: 4.6, distance: '10.8 km', lat: 18.4636, lng: 73.9038, image: 'https://picsum.photos/seed/nibm/100/100' },
-  { id: 46, name: 'National Insurance Academy (NIA)', type: 'Government', category: 'Management', address: 'Balewadi, Pune', rating: 4.5, distance: '10.5 km', lat: 18.5567, lng: 73.7915, image: 'https://picsum.photos/seed/nia/100/100' },
-  { id: 47, name: 'Symbiosis Institute of Management Studies', type: 'Private', category: 'Management', address: 'Khadki, Pune', rating: 4.5, distance: '5.0 km', lat: 18.5440, lng: 73.8440, image: 'https://picsum.photos/seed/sims/100/100' },
-  { id: 48, name: 'MES Garware College of Commerce', type: 'Private', category: 'Commerce', address: 'Karve Road, Pune', rating: 4.4, distance: '2.5 km', lat: 18.5100, lng: 73.8300, image: 'https://picsum.photos/seed/garware/100/100' },
-  { id: 49, name: 'BMCC Pune', type: 'Private', category: 'Commerce', address: 'Shivajinagar, Pune', rating: 4.6, distance: '3.2 km', lat: 18.5240, lng: 73.8350, image: 'https://picsum.photos/seed/bmcc/100/100' },
+  // Stop speech when component unmounts or college changes
+  useEffect(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    setAiInsight(null);
+  }, [selectedCollege]);
 
-  // ==========================================
-  // 4. MEDICAL
-  // ==========================================
-  { id: 50, name: 'Armed Forces Medical College (AFMC)', type: 'Government', category: 'Medical', address: 'Wanowrie, Pune', rating: 4.8, distance: '6.2 km', lat: 18.5034, lng: 73.8965, image: 'https://picsum.photos/seed/afmc/100/100' },
-  { id: 51, name: 'B. J. Medical College (BJMC)', type: 'Government', category: 'Medical', address: 'Pune Station, Pune', rating: 4.7, distance: '1.2 km', lat: 18.5284, lng: 73.8739, image: 'https://picsum.photos/seed/bjmc/100/100' },
-  { id: 52, name: 'Bharati Vidyapeeth Medical College', type: 'Private', category: 'Medical', address: 'Katraj, Pune', rating: 4.4, distance: '9.5 km', lat: 18.4500, lng: 73.8500, image: 'https://picsum.photos/seed/bvmc/100/100' },
-  { id: 53, name: 'Smt. Kashibai Navale Medical College', type: 'Private', category: 'Medical', address: 'Narhe, Pune', rating: 4.2, distance: '12.0 km', lat: 18.4400, lng: 73.8200, image: 'https://picsum.photos/seed/sknmc/100/100' },
+  const rawColleges: Omit<College, 'description' | 'nirfRank'>[] = [
+    // 1. UNIVERSITIES
+    { id: 1, name: 'Savitribai Phule Pune University', type: 'Government', category: 'State University', address: 'Ganeshkhind, Pune', rating: 4.7, distance: '4.5 km', lat: 18.5531, lng: 73.8245, image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000' },
+    { id: 2, name: 'Bharati Vidyapeeth', type: 'Private', category: 'Deemed University', address: 'LBS Road, Pune', rating: 4.3, distance: '9.2 km', lat: 18.4575, lng: 73.8508, image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000' },
+    { id: 26, name: 'College of Engineering Pune (COEP)', type: 'Government', category: 'Engineering', address: 'Shivajinagar, Pune', rating: 4.8, distance: '2.5 km', lat: 18.5293, lng: 73.8565, image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000' },
+    { id: 41, name: 'Pune Institute of Computer Technology (PICT)', type: 'Private', category: 'Engineering', address: 'Dhankawadi, Pune', rating: 4.7, distance: '8.4 km', lat: 18.4604, lng: 73.8580, image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1000' },
+    { id: 50, name: 'Armed Forces Medical College (AFMC)', type: 'Government', category: 'Medical', address: 'Wanowrie, Pune', rating: 4.8, distance: '6.2 km', lat: 18.5034, lng: 73.8965, image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=1000' },
+    { id: 54, name: 'Fergusson College', type: 'Private', category: 'Arts & Science', address: 'FC Road, Pune', rating: 4.6, distance: '3.1 km', lat: 18.5236, lng: 73.8411, image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000' },
+    { id: 14, name: 'Symbiosis International University', type: 'Private', category: 'Private University', address: 'Lavale, Pune', rating: 4.6, distance: '14.2 km', lat: 18.5492, lng: 73.9261, image: 'https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&q=80&w=1000' },
+    { id: 60, name: 'National Chemical Laboratory (NCL)', type: 'Government', category: 'Research', address: 'Pashan, Pune', rating: 4.8, distance: '7.2 km', lat: 18.5430, lng: 73.8120, image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=1000' },
+    { id: 31, name: 'MKSSS Cummins College of Engineering for Women', type: 'Private', category: 'Autonomous', address: 'Karve Nagar, Pune', rating: 4.6, distance: '7.1 km', lat: 18.4897, lng: 73.8143, image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000' },
+  ];
 
-  // ==========================================
-  // 5. ARTS, SCIENCE, LAW & OTHERS
-  // ==========================================
-  { id: 54, name: 'Fergusson College', type: 'Private', category: 'Arts & Science', address: 'FC Road, Pune', rating: 4.6, distance: '3.1 km', lat: 18.5236, lng: 73.8411, image: 'https://picsum.photos/seed/fergusson/100/100' },
-  { id: 55, name: 'ILS Law College', type: 'Private', category: 'Law', address: 'Law College Road, Pune', rating: 4.7, distance: '4.0 km', lat: 18.5218, lng: 73.8300, image: 'https://picsum.photos/seed/ils/100/100' },
-  { id: 56, name: 'Symbiosis Law School', type: 'Private', category: 'Law', address: 'Viman Nagar, Pune', rating: 4.6, distance: '8.8 km', lat: 18.5600, lng: 73.9100, image: 'https://picsum.photos/seed/sls/100/100' },
-  { id: 57, name: 'Film and Television Institute of India (FTII)', type: 'Government', category: 'Media/Film', address: 'Law College Road, Pune', rating: 4.7, distance: '3.8 km', lat: 18.5140, lng: 73.8320, image: 'https://picsum.photos/seed/ftii/100/100' },
-  { id: 58, name: 'Nowrosjee Wadia College', type: 'Private', category: 'Arts & Science', address: 'V.K. Joag Path, Pune', rating: 4.3, distance: '1.5 km', lat: 18.5300, lng: 73.8800, image: 'https://picsum.photos/seed/wadia/100/100' },
-
-  // ==========================================
-  // 6. RESEARCH INSTITUTES
-  // ==========================================
-  { id: 59, name: 'Centre for Development of Advanced Computing (C-DAC)', type: 'Government', category: 'Research', address: 'Pashan Road, Pune', rating: 4.7, distance: '7.8 km', lat: 18.5520, lng: 73.8130, image: 'https://picsum.photos/seed/cdac/100/100' },
-  { id: 60, name: 'National Chemical Laboratory (NCL)', type: 'Government', category: 'Research', address: 'Pashan, Pune', rating: 4.8, distance: '7.2 km', lat: 18.5430, lng: 73.8120, image: 'https://picsum.photos/seed/ncl/100/100' },
-  { id: 61, name: 'National Institute of Virology (NIV)', type: 'Government', category: 'Research', address: 'Ambedkar Road, Pune', rating: 4.8, distance: '1.5 km', lat: 18.5280, lng: 73.8780, image: 'https://picsum.photos/seed/niv/100/100' },
-
-  // ==========================================
-  // 7. SCHOOLS (VARIOUS CITIES)
-  // ==========================================
-  { id: 62, name: 'Mount Carmel High School', type: 'Private', category: 'School', address: 'Akola', rating: 4.5, distance: '600 km', lat: 20.7002, lng: 77.0082, image: 'https://picsum.photos/seed/akola-s/100/100' },
-  { id: 63, name: 'Nath Valley School', type: 'Private', category: 'School', address: 'Aurangabad', rating: 4.7, distance: '235 km', lat: 19.8347, lng: 75.2811, image: 'https://picsum.photos/seed/aurang-s/100/100' },
-  { id: 64, name: 'Dhirubhai Ambani International School', type: 'Private', category: 'School', address: 'BKC, Mumbai', rating: 4.9, distance: '155 km', lat: 19.0660, lng: 72.8631, image: 'https://picsum.photos/seed/mumbai-s/100/100' },
-  { id: 65, name: 'The Bishop\'s School', type: 'Private', category: 'School', address: 'Camp, Pune', rating: 4.8, distance: '2.8 km', lat: 18.5130, lng: 73.8780, image: 'https://picsum.photos/seed/bishop-s/100/100' },
-  { id: 66, name: 'Delhi Public School', type: 'Private', category: 'School', address: 'Mohammadwadi, Pune', rating: 4.6, distance: '10.5 km', lat: 18.4680, lng: 73.9180, image: 'https://picsum.photos/seed/dps-s/100/100' },
-  { id: 67, name: 'Army Public School', type: 'Government', category: 'School', address: 'Camp, Pune', rating: 4.6, distance: '3.5 km', lat: 18.5200, lng: 73.8800, image: 'https://picsum.photos/seed/army-s/100/100' },
-  { id: 68, name: 'St. Mary\'s School', type: 'Private', category: 'School', address: 'Camp, Pune', rating: 4.7, distance: '3.0 km', lat: 18.5110, lng: 73.8760, image: 'https://picsum.photos/seed/stmary-s/100/100' },
-  { id: 69, name: 'Loyola High School', type: 'Private', category: 'School', address: 'Pashan, Pune', rating: 4.7, distance: '6.2 km', lat: 18.5440, lng: 73.8180, image: 'https://picsum.photos/seed/loyola-s/100/100' },
-  { id: 70, name: 'Smt. Sulochanadevi Singhania School', type: 'Private', category: 'School', address: 'Thane', rating: 4.9, distance: '140 km', lat: 19.2000, lng: 72.9700, image: 'https://picsum.photos/seed/thane-s/100/100' }
-];
+  // Enrich data with descriptions and mock NIRF rankings for the detail view
+  const colleges: College[] = rawColleges.map((c, index) => ({
+    ...c,
+    description: `${c.name} is a premier ${c.category.toLowerCase()} institution located in the heart of ${c.address.split(',')[0]}. Known for its state-of-the-art infrastructure, expert faculty, and vibrant campus life, it offers a comprehensive curriculum designed to prepare students for global challenges. The institution boasts strong industry connections and an outstanding placement record.`,
+    nirfRank: index % 3 === 0 ? Math.floor(Math.random() * 50) + 1 : undefined
+  }));
 
   const filteredColleges = colleges.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -158,156 +248,318 @@ export default function CollegesNearby() {
   const handleCollegeClick = (college: College) => {
     setSelectedCollege(college);
     setMapCenter([college.lat, college.lng]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Features Logic
+  const handleListen = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    if (selectedCollege?.description) {
+      const utterance = new SpeechSynthesisUtterance(selectedCollege.description);
+      utterance.onend = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    }
+  };
+
+  const handleCourseAI = async () => {
+    setIsAILoading(true);
+    setAiInsight(null);
+    
+    if (selectedCollege) {
+      const insight = await fetchGeminiInsight(selectedCollege);
+      setAiInsight(insight);
+    }
+    
+    setIsAILoading(false);
+  };
+
+  const handleNavigate = () => {
+    if (selectedCollege) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${selectedCollege.lat},${selectedCollege.lng}`, '_blank');
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
-            <MapPin size={24} />
+    <div className="max-w-[1600px] mx-auto space-y-6 p-4 lg:p-8 bg-[#f8fafc] min-h-screen font-sans text-slate-900">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-200">
+            <MapPin size={24} strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Live Map</h1>
-            <p className="text-xs text-gray-500">Find top-rated institutes near you</p>
+            <h1 className="text-2xl font-black text-slate-900">College Discovery</h1>
+            <p className="text-sm font-medium text-slate-500">Explore, analyze, and navigate to top-rated institutes</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors text-sm">
-          <Layers size={16} />
-          Map Layers
+        <button className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-full text-sm font-bold hover:bg-slate-100 transition-all shadow-sm">
+          <Layers size={18} />
+          Toggle Map Layers
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
-        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="font-bold text-gray-900 mb-4">Search Location</h2>
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="e.g., Pune, Engineering..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                <Search size={16} />
-              </button>
-            </div>
-          </div>
+      <div className="grid lg:grid-cols-12 gap-6 h-[calc(100vh-10rem)] min-h-[800px]">
+        
+        {/* Left Panel: Search & Lists OR Detail View */}
+        <div className="lg:col-span-4 h-full flex flex-col space-y-4 overflow-hidden relative">
+          
+          <AnimatePresence mode="wait">
+            {!selectedCollege ? (
+              <motion.div 
+                key="list-view"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex flex-col h-full space-y-4"
+              >
+                {/* Search */}
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 shrink-0">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="Search colleges, categories..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none text-sm font-medium transition-all"
+                    />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  </div>
+                </div>
 
-          {selectedCollege ? (
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="font-bold text-gray-900 text-lg leading-tight">{selectedCollege.name}</h2>
-                <button onClick={() => setSelectedCollege(null)} className="text-gray-400 hover:text-gray-600">×</button>
-              </div>
-              <div className="w-full h-32 rounded-xl overflow-hidden mb-4 relative">
-                <img src={selectedCollege.image} alt={selectedCollege.name} className="w-full h-full object-cover" />
-                <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md">
-                  {selectedCollege.category}
-                </div>
-              </div>
-              <div className="space-y-3 text-sm text-gray-600 mb-6">
-                <div className="flex items-start gap-2">
-                  <MapPin size={16} className="text-orange-500 shrink-0 mt-0.5" />
-                  <p>{selectedCollege.address}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                  <span className="font-bold text-gray-900">{selectedCollege.rating}</span>
-                  <span className="text-gray-400">• {selectedCollege.distance} away</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors">View Courses</button>
-                <button className="px-4 py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors flex items-center justify-center gap-2">
-                  <Navigation size={16} /> Navigate
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                <MapPin size={32} />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Select a College</h3>
-              <p className="text-gray-500 text-sm">Click on any college card or map marker to see detailed information.</p>
-            </div>
-          )}
-
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Building2 className="text-orange-500" size={20} />
-              Government Institutes
-            </h2>
-            {governmentColleges.length > 0 ? (
-              <div className="space-y-3">
-                {governmentColleges.map(college => (
-                  <div key={college.id} onClick={() => handleCollegeClick(college)} className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${selectedCollege?.id === college.id ? 'border-orange-500 bg-orange-50' : 'border-gray-100 hover:border-orange-200 hover:bg-gray-50'}`}>
-                    <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
-                      <img src={college.image} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="overflow-hidden">
-                      <h3 className="font-bold text-gray-900 text-sm truncate">{college.name}</h3>
-                      <p className="text-xs text-gray-500 truncate">{college.category}</p>
+                {/* Lists */}
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-4">
+                  {/* Government */}
+                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                      <Building2 className="text-orange-500" size={18} />
+                      Government Institutes
+                    </h2>
+                    <div className="space-y-3">
+                      {governmentColleges.map(college => (
+                        <div key={college.id} onClick={() => handleCollegeClick(college)} className="p-3 rounded-xl border border-slate-100 hover:border-orange-300 hover:shadow-md hover:bg-orange-50/30 transition-all cursor-pointer flex items-center gap-4 group">
+                          <div className="w-12 h-12 rounded-lg bg-slate-200 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+                            <img src={college.image} alt="" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="overflow-hidden flex-1">
+                            <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-orange-600 transition-colors">{college.name}</h3>
+                            <p className="text-xs font-medium text-slate-500 truncate flex items-center gap-1 mt-0.5">
+                              <Star size={12} className="text-amber-400 fill-amber-400" /> {college.rating} • {college.distance}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : <p className="text-sm text-gray-500 text-center py-4">No colleges found.</p>}
-          </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <GraduationCap className="text-indigo-600" size={20} />
-              Private Colleges
-            </h2>
-            {privateColleges.length > 0 ? (
-              <div className="space-y-3">
-                {privateColleges.map(college => (
-                  <div key={college.id} onClick={() => handleCollegeClick(college)} className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${selectedCollege?.id === college.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'}`}>
-                    <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
-                      <img src={college.image} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="overflow-hidden">
-                      <h3 className="font-bold text-gray-900 text-sm truncate">{college.name}</h3>
-                      <p className="text-xs text-gray-500 truncate">{college.category}</p>
+                  {/* Private */}
+                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                      <GraduationCap className="text-indigo-600" size={18} />
+                      Private Institutes
+                    </h2>
+                    <div className="space-y-3">
+                      {privateColleges.map(college => (
+                        <div key={college.id} onClick={() => handleCollegeClick(college)} className="p-3 rounded-xl border border-slate-100 hover:border-indigo-300 hover:shadow-md hover:bg-indigo-50/30 transition-all cursor-pointer flex items-center gap-4 group">
+                          <div className="w-12 h-12 rounded-lg bg-slate-200 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+                            <img src={college.image} alt="" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="overflow-hidden flex-1">
+                            <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors">{college.name}</h3>
+                            <p className="text-xs font-medium text-slate-500 truncate flex items-center gap-1 mt-0.5">
+                              <Star size={12} className="text-amber-400 fill-amber-400" /> {college.rating} • {college.distance}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : <p className="text-sm text-gray-500 text-center py-4">No colleges found.</p>}
-          </div>
+                </div>
+              </motion.div>
+            ) : (
+              // HIGH FIDELITY DETAIL VIEW
+              <motion.div 
+                key="detail-view"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="flex flex-col h-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden"
+              >
+                {/* Detail Header / Hero */}
+                <div className="relative h-48 shrink-0">
+                  <img src={selectedCollege.image} alt={selectedCollege.name} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                  
+                  <button 
+                    onClick={() => setSelectedCollege(null)} 
+                    className="absolute top-4 left-4 w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  {selectedCollege.nirfRank && (
+                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-amber-500 text-white rounded-full text-xs font-black tracking-wider flex items-center gap-1.5 shadow-lg">
+                      <Trophy size={14} /> NIRF #{selectedCollege.nirfRank}
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-4 left-5 right-5">
+                    <div className="inline-block px-2.5 py-1 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded mb-2">
+                      {selectedCollege.category}
+                    </div>
+                    <h2 className="font-black text-white text-2xl leading-tight drop-shadow-md">{selectedCollege.name}</h2>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                  {/* Quick Info */}
+                  <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-600 border-b border-slate-100 pb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><MapPin size={16}/></div>
+                      <span>{selectedCollege.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><Star size={16} className="fill-amber-500"/></div>
+                      <span className="text-slate-900 font-bold">{selectedCollege.rating} Rating</span>
+                    </div>
+                  </div>
+
+                  {/* Campus Overview */}
+                  <div>
+                    <h3 className="font-black text-slate-900 text-lg mb-3">Campus Overview</h3>
+                    <div className="relative mb-6">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-full"></div>
+                      <p className="text-slate-600 text-sm leading-relaxed pl-4">
+                        "{selectedCollege.description}"
+                      </p>
+                    </div>
+
+                    {/* Google Maps Embed */}
+                    <h3 className="font-black text-slate-900 text-lg mb-3 flex items-center gap-2">
+                      <MapPin size={18} className="text-emerald-500" />
+                      Live Location Map
+                    </h3>
+                    <div className="w-full h-48 rounded-xl overflow-hidden border border-slate-200 shadow-inner mb-6 relative">
+                      <iframe 
+                        title={`Map of ${selectedCollege.name}`}
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 0 }}
+                        src={`https://maps.google.com/maps?q=${selectedCollege.lat},${selectedCollege.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                  </div>
+
+                  {/* AI Insights Module */}
+                  <AnimatePresence>
+                    {isAILoading && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center gap-3">
+                        <Loader2 className="animate-spin text-indigo-500" size={20} />
+                        <span className="text-sm font-bold text-indigo-700">AI analyzing curriculum & placements...</span>
+                      </motion.div>
+                    )}
+                    {aiInsight && (
+                      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-5 shadow-lg shadow-indigo-200 text-white relative overflow-hidden">
+                        <Bot className="absolute -right-4 -bottom-4 w-24 h-24 text-white opacity-10" />
+                        <h4 className="font-black text-sm uppercase tracking-widest text-indigo-200 mb-2 flex items-center gap-2"><Sparkles size={14}/> Gemini AI Insight</h4>
+                        <p className="text-sm leading-relaxed text-indigo-50 font-medium relative z-10">{aiInsight}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* ACTION SUITE */}
+                <div className="p-5 border-t border-slate-100 bg-slate-50 grid grid-cols-2 gap-3 shrink-0">
+                  <button 
+                    onClick={handleCourseAI}
+                    disabled={isAILoading}
+                    className="flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md transition-all group disabled:opacity-50"
+                  >
+                    <Bot size={22} className="text-indigo-500 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold text-slate-700">Gemini Info</span>
+                  </button>
+                  
+                  <button 
+                    onClick={handleListen}
+                    className={`flex flex-col items-center justify-center p-3 border rounded-xl transition-all group ${isSpeaking ? 'bg-blue-50 border-blue-300 shadow-inner' : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md'}`}
+                  >
+                    {isSpeaking ? (
+                      <VolumeX size={22} className="text-blue-600 mb-1 animate-pulse" />
+                    ) : (
+                      <Volume2 size={22} className="text-blue-500 mb-1 group-hover:scale-110 transition-transform" />
+                    )}
+                    <span className={`text-xs font-bold ${isSpeaking ? 'text-blue-700' : 'text-slate-700'}`}>{isSpeaking ? 'Stop' : 'Voice Asst'}</span>
+                  </button>
+                  
+                  <button 
+                    onClick={handleNavigate}
+                    className="flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-400 hover:shadow-md transition-all group"
+                  >
+                    <Navigation size={22} className="text-emerald-500 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold text-slate-700">Navigate</span>
+                  </button>
+                  
+                  <button className="flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-xl hover:border-amber-400 hover:shadow-md transition-all group">
+                    <ExternalLink size={22} className="text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold text-slate-700">Website</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="lg:col-span-2 space-y-6 flex flex-col h-full">
-          <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative z-0">
-            <div className="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg shadow-sm border border-gray-200 font-bold text-xs text-gray-700">Government Institutes</div>
-            <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={false} className="w-full h-full">
-              <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <MapUpdater center={mapCenter} />
-              {governmentColleges.map(college => (
-                <Marker key={college.id} position={[college.lat, college.lng]} eventHandlers={{ click: () => handleCollegeClick(college) }}>
-                  <Popup><div className="text-center"><h3 className="font-bold text-sm">{college.name}</h3><p className="text-xs text-gray-500">{college.category}</p></div></Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+        {/* Right Panel: Map Area */}
+        <div className="lg:col-span-8 h-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative z-0">
+          <div className="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-slate-200 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="font-bold text-sm text-slate-700">Live Campus Map</span>
           </div>
-          <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative z-0">
-            <div className="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg shadow-sm border border-gray-200 font-bold text-xs text-gray-700">Private Institutes</div>
-            <MapContainer center={mapCenter} zoom={13} scrollWheelZoom={false} className="w-full h-full">
-              <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <MapUpdater center={mapCenter} />
-              {privateColleges.map(college => (
-                <Marker key={college.id} position={[college.lat, college.lng]} eventHandlers={{ click: () => handleCollegeClick(college) }}>
-                  <Popup><div className="text-center"><h3 className="font-bold text-sm">{college.name}</h3><p className="text-xs text-gray-500">{college.category}</p></div></Popup>
-                </Marker>
-              ))}
-            </MapContainer>
-          </div>
+          
+          <LiveMap 
+            colleges={filteredColleges} 
+            selectedCollege={selectedCollege} 
+            onMarkerClick={handleCollegeClick}
+            mapCenter={mapCenter}
+          />
         </div>
       </div>
+      
+      {/* Required CSS to make custom scrollbar look nice and fix Leaflet issues */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #cbd5e1;
+          border-radius: 20px;
+        }
+        .leaflet-popup-content-wrapper {
+          border-radius: 12px;
+          box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+          border: 1px solid #e2e8f0;
+        }
+        .leaflet-popup-tip {
+          background: white;
+        }
+        .custom-div-icon {
+          background: transparent;
+          border: none;
+        }
+        /* Fix leaflet z-index to not overlap panels */
+        .leaflet-container {
+          z-index: 0 !important;
+        }
+      `}} />
     </div>
   );
 }

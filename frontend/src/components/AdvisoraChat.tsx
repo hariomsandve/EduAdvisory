@@ -50,7 +50,7 @@ export default function AdvisoraChat() {
 
     try {
       // Using your working key!
-      const genAI = new GoogleGenerativeAI("AIzaSyCQWllM51HidUNNwBWD861oafEy1MEzSts");
+      const genAI = new GoogleGenerativeAI("AIzaSyCewOqoBK_LyFJMrsQOt3MXYQvuGJHdEi4");
       
       const model = genAI.getGenerativeModel({ 
         model: "gemini-2.5-flash",
