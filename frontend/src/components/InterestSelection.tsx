@@ -80,7 +80,7 @@ export default function InterestSelection({ onComplete }: InterestSelectionProps
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
+            <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
             <span className="text-xl font-bold tracking-tight">
               <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
             </span>

@@ -29,7 +29,7 @@ export default function LandingPage({ onAuth, onSignUpClick }: LandingPageProps)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2 whitespace-nowrap">
-              <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
+              <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
               <span className="text-xl font-bold tracking-tight">
                 <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
               </span>
@@ -97,7 +97,7 @@ export default function LandingPage({ onAuth, onSignUpClick }: LandingPageProps)
               playsInline
               className="rounded-3xl shadow-2xl w-full object-cover aspect-video"
             >
-              <source src="carrerpath.mp4" type="video/mp4" />
+              <source src="/videos/carrerpath.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hidden sm:block">
@@ -256,7 +256,7 @@ export default function LandingPage({ onAuth, onSignUpClick }: LandingPageProps)
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="col-span-1 lg:col-span-1">
               <div className="flex items-center gap-2 mb-6 whitespace-nowrap">
-                <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
+                <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
                 <span className="text-xl font-bold tracking-tight">
                   <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
                 </span>

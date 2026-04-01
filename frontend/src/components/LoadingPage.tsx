@@ -25,7 +25,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col items-center justify-center font-sans">
       <main className="flex flex-col items-center justify-center flex-grow text-center">
-        <img src="/logo.png" alt="Edu-Advisory Logo" className="w-32 h-32 mb-6 object-contain" />
+        <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-32 h-32 mb-6 object-contain" />
         <h1 className="text-5xl font-bold whitespace-nowrap">
           <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
         </h1>

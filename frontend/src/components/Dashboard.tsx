@@ -141,7 +141,7 @@ export default function Dashboard({ onNavigate, onLogout, userName: propUserName
       >
         {/* Logo Area */}
         <div className={`flex items-center gap-3 h-20 px-6 ${isSidebarOpen ? 'justify-start' : 'justify-center'}`}>
-          <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain shrink-0" />
+          <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain shrink-0" />
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.span 

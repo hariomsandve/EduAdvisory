@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ParentSettings from './ParentSettings';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, 
@@ -1468,6 +1469,7 @@ const ParentDashboard = ({ userName = "Parent", onLogout }: ParentDashboardProps
       case 'resources': return renderResources();
       case 'productivity': return renderProductivity();
       case 'community': return renderCommunity();
+      case 'settings': return <ParentSettings />;
       default: return renderHome();
     }
   };

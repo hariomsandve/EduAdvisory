@@ -16,7 +16,7 @@ export default function RoleSelection({ onSelect, onBack }: RoleSelectionProps) 
       description: 'Find career paths, take quizzes & submit assignments.',
       icon: <User size={48} className="text-orange-500" />,
       // Changed from image to video source
-      videoSrc: "student.mp4", 
+      videoSrc: "/videos/student.mp4", 
       color: 'border-orange-100 hover:border-orange-400 bg-orange-50/30'
     },
     {
@@ -25,7 +25,7 @@ export default function RoleSelection({ onSelect, onBack }: RoleSelectionProps) 
       description: 'Manage classes, upload notes & analyze trends.',
       icon: <GraduationCap size={48} className="text-blue-500" />,
       // Changed from image to video source
-      videoSrc: "teacher.mp4", 
+      videoSrc: "/videos/teacher.mp4", 
       color: 'border-blue-100 hover:border-blue-400 bg-blue-50/30'
     },
     {
@@ -34,7 +34,7 @@ export default function RoleSelection({ onSelect, onBack }: RoleSelectionProps) 
       description: "Track your child's progress & view performance reports.",
       icon: <Users size={48} className="text-green-500" />,
       // Changed from image to video source
-      videoSrc: "parents.mp4", 
+      videoSrc: "/videos/parents.mp4", 
       color: 'border-green-100 hover:border-green-400 bg-green-50/30'
     }
   ];
@@ -56,7 +56,7 @@ export default function RoleSelection({ onSelect, onBack }: RoleSelectionProps) 
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
+            <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
             <span className="text-xl font-bold tracking-tight">
               <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
             </span>

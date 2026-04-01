@@ -35,7 +35,7 @@ export default function AuthPage({ initialMode, onBack, onSuccess }: AuthPagePro
           <ArrowLeft size={20} className="text-gray-600 group-hover:-translate-x-1 transition-transform" />
         </button>
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
+          <img src="/images/logo.png" alt="Edu-Advisory Logo" className="w-8 h-8 object-contain" />
           <span className="text-xl font-bold tracking-tight">
             <span className="text-green-600">Edu</span>-<span className="text-orange-500">Advisory</span>
           </span>
@@ -52,7 +52,7 @@ export default function AuthPage({ initialMode, onBack, onSuccess }: AuthPagePro
           className="w-full h-full object-cover"
         >
           {/* Using a high-quality placeholder video as signup_animation.mp4 is not provided */}
-          <source src="macro.mp4" type="video/mp4" />
+          <source src="/videos/macro.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>
