@@ -1,426 +1,505 @@
-import { useState, useEffect } from 'react';
-import { 
-  User, Lock, Bell, Shield, Palette, Globe, Link as LinkIcon, 
-  CreditCard, Database, Accessibility, ChevronRight, Save, 
-  Moon, Sun, Check, AlertCircle, Trash2, Download, Eye, EyeOff, Loader2
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+   User, Lock, Bell, Shield, Palette, Globe, Link as LinkIcon,
+   CreditCard, Database, Accessibility, ChevronRight, Save,
+   Moon, Sun, Check, AlertCircle, Trash2, Download, Eye, EyeOff,
+   Camera, Sparkles, Plus, X, Smartphone, MapPin, History,
+   LogOut, Mail, AppWindow, Zap, Eye as ViewIcon, Languages,
+   Monitor, Type, Layout, CreditCard as BillingIcon, FileJson,
+   FileText, RotateCcw, Volume2, Search, Info, Settings as SettingsIcon,
+   CheckCircle2, Loader2, QrCode, Share2, Heart, MessageSquare,
+   Star, Trophy, Crown, PlayCircle, Paperclip, Send, MoreHorizontal,
+   Smartphone as PhoneIcon, GlobeIcon, MousePointer2, Contrast,
+   Languages as LangIcon, ShieldCheck, CreditCard as CardIcon
+} from 'lucide-react';
 
-// --- TRANSLATIONS DICTIONARY ---
-const translations: Record<string, Record<string, string>> = {
-  en: {
-    settings: 'Settings', profile: 'Profile Settings', security: 'Account Security', notifications: 'Notifications',
-    privacy: 'Privacy & Safety', appearance: 'Appearance', language: 'Language & Region', connections: 'Connected Accounts',
-    billing: 'Billing & Subscription', data: 'Data Management', accessibility: 'Accessibility',
-    personal_info: 'Personal Information', update_photo: 'Update your photo and personal details.',
-    full_name: 'Full Name', email: 'Email Address', bio: 'Bio', bio_placeholder: 'Tell us about yourself...',
-    change_photo: 'Change', security_title: 'Security', security_desc: 'Manage your password and account security.',
-    change_password: 'Change Password', curr_pass: 'Current Password', new_pass: 'New Password', conf_pass: 'Confirm New Password',
-    two_factor: 'Two-Factor Authentication', two_factor_desc: 'Add an extra layer of security to your account.', enable: 'Enable',
-    appearance_title: 'Appearance', appearance_desc: 'Customize how the application looks to you.',
-    light_mode: 'Light Mode', dark_mode: 'Dark Mode', accent_color: 'Accent Color',
-    lang_title: 'Language & Region', lang_desc: 'Choose your preferred language for the interface.',
-    data_title: 'Data Management', data_desc: 'Control your data and export your information.',
-    export_data: 'Export Personal Data', export_desc: 'Download a copy of all your data in JSON format.', export_btn: 'Export',
-    delete_acc: 'Delete Account', delete_desc: 'Permanently delete your account and all associated data.', delete_btn: 'Delete',
-    under_dev: 'This section is currently under development. Check back soon for more features!',
-    cancel: 'Cancel', save: 'Save Changes', saving: 'Saving...', success: 'Settings saved successfully!'
-  },
-  hi: {
-    settings: 'सेटिंग्स', profile: 'प्रोफाइल सेटिंग्स', security: 'खाता सुरक्षा', notifications: 'सूचनाएं',
-    privacy: 'गोपनीयता और सुरक्षा', appearance: 'दिखावट', language: 'भाषा और क्षेत्र', connections: 'जुड़े हुए खाते',
-    billing: 'बिलिंग और सदस्यता', data: 'डेटा प्रबंधन', accessibility: 'पहुंच (एक्सेसिबिलिटी)',
-    personal_info: 'व्यक्तिगत जानकारी', update_photo: 'अपनी तस्वीर और व्यक्तिगत विवरण अपडेट करें।',
-    full_name: 'पूरा नाम', email: 'ईमेल पता', bio: 'परिचय', bio_placeholder: 'अपने बारे में कुछ बताएं...',
-    change_photo: 'बदलें', security_title: 'सुरक्षा', security_desc: 'अपना पासवर्ड और खाता सुरक्षा प्रबंधित करें।',
-    change_password: 'पासवर्ड बदलें', curr_pass: 'वर्तमान पासवर्ड', new_pass: 'नया पासवर्ड', conf_pass: 'नया पासवर्ड कन्फर्म करें',
-    two_factor: 'टू-फैक्टर ऑथेंटिकेशन', two_factor_desc: 'अपने खाते में सुरक्षा की एक अतिरिक्त परत जोड़ें।', enable: 'सक्षम करें',
-    appearance_title: 'दिखावट', appearance_desc: 'एप्लिकेशन आपके लिए कैसा दिखता है, इसे अनुकूलित करें।',
-    light_mode: 'लाइट मोड', dark_mode: 'डार्क मोड', accent_color: 'एक्सेंट कलर',
-    lang_title: 'भाषा और क्षेत्र', lang_desc: 'इंटरफ़ेस के लिए अपनी पसंदीदा भाषा चुनें।',
-    data_title: 'डेटा प्रबंधन', data_desc: 'अपना डेटा नियंत्रित करें और अपनी जानकारी निर्यात करें।',
-    export_data: 'व्यक्तिगत डेटा निर्यात करें', export_desc: 'JSON प्रारूप में अपने सभी डेटा की एक प्रति डाउनलोड करें।', export_btn: 'निर्यात करें',
-    delete_acc: 'खाता हटाएं', delete_desc: 'अपना खाता और सभी संबंधित डेटा स्थायी रूप से हटाएं।', delete_btn: 'हटाएं',
-    under_dev: 'यह अनुभाग वर्तमान में विकास के अधीन है। अधिक सुविधाओं के लिए जल्द ही वापस आएं!',
-    cancel: 'रद्द करें', save: 'परिवर्तन सहेजें', saving: 'सहेजा जा रहा है...', success: 'सेटिंग्स सफलतापूर्वक सहेजी गईं!'
-  },
-  mr: {
-    settings: 'सेटिंग्ज', profile: 'प्रोफाइल सेटिंग्ज', security: 'खाते सुरक्षा', notifications: 'सूचना',
-    privacy: 'गोपनीयता आणि सुरक्षितता', appearance: 'स्वरूप', language: 'भाषा आणि प्रदेश', connections: 'जोडलेली खाती',
-    billing: 'बिलिंग आणि सदस्यता', data: 'डेटा व्यवस्थापन', accessibility: 'प्रवेशयोग्यता',
-    personal_info: 'वैयक्तिक माहिती', update_photo: 'तुमचा फोटो आणि वैयक्तिक तपशील अपडेट करा.',
-    full_name: 'पूर्ण नाव', email: 'ईमेल पत्ता', bio: 'माहिती', bio_placeholder: 'तुमच्याबद्दल सांगा...',
-    change_photo: 'बदला', security_title: 'सुरक्षा', security_desc: 'तुमचा पासवर्ड आणि खाते सुरक्षा व्यवस्थापित करा.',
-    change_password: 'पासवर्ड बदला', curr_pass: 'सध्याचा पासवर्ड', new_pass: 'नवीन पासवर्ड', conf_pass: 'नवीन पासवर्डची पुष्टी करा',
-    two_factor: 'टू-फॅक्टर ऑथेंटिकेशन', two_factor_desc: 'तुमच्या खात्यात सुरक्षिततेचा अतिरिक्त स्तर जोडा.', enable: 'सक्षम करा',
-    appearance_title: 'स्वरूप', appearance_desc: 'अप्लिकेशन तुम्हाला कसे दिसते ते सानुकूलित करा.',
-    light_mode: 'लाईट मोड', dark_mode: 'डार्क मोड', accent_color: 'अॅक्सेंट कलर',
-    lang_title: 'भाषा आणि प्रदेश', lang_desc: 'इंटरफेससाठी तुमची आवडती भाषा निवडा.',
-    data_title: 'डेटा व्यवस्थापन', data_desc: 'तुमचा डेटा नियंत्रित करा आणि तुमची माहिती निर्यात करा.',
-    export_data: 'वैयक्तिक डेटा निर्यात करा', export_desc: 'JSON फॉरमॅटमध्ये तुमच्या सर्व डेटाची प्रत डाउनलोड करा.', export_btn: 'निर्यात करा',
-    delete_acc: 'खाते हटवा', delete_desc: 'तुमचे खाते आणि सर्व संबंधित डेटा कायमचा हटवा.', delete_btn: 'हटवा',
-    under_dev: 'हा विभाग सध्या विकसित होत आहे. अधिक वैशिष्ट्यांसाठी लवकरच परत या!',
-    cancel: 'रद्द करा', save: 'बदल जतन करा', saving: 'जतन करत आहे...', success: 'सेटिंग्ज यशस्वीरित्या जतन केल्या!'
-  }
-};
+// --- Shared Internal Components ---
 
-interface SettingSection {
-  id: string;
-  labelKey: string;
-  icon: any;
-}
+const Card = ({ children, title, icon: Icon, description, badge }: any) => (
+   <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8 relative overflow-hidden"
+   >
+      <div className="flex items-center justify-between mb-8">
+         <div className="flex items-center gap-4">
+            {Icon && <div className="w-12 h-12 bg-orange-50 dark:bg-orange-500/10 text-orange-600 rounded-2xl flex items-center justify-center"><Icon size={22} /></div>}
+            <div>
+               <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">{title}</h3>
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{description}</p>
+            </div>
+         </div>
+         {badge && (
+            <div className="px-4 py-1.5 bg-orange-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-200/50">
+               {badge}
+            </div>
+         )}
+      </div>
+      {children}
+   </motion.div>
+);
+
+const TelegramToggle = ({ label, description, enabled, onChange, icon: Icon }: any) => (
+   <button
+      onClick={() => onChange(!enabled)}
+      className="w-full flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded-[1.5rem] group"
+   >
+      <div className="flex items-center gap-4 text-left">
+         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${enabled ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:scale-110'}`}>
+            <Icon size={18} />
+         </div>
+         <div>
+            <p className="text-[14px] font-black text-gray-900 dark:text-white leading-none mb-1">{label}</p>
+            <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-tight">{description}</p>
+         </div>
+      </div>
+      <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${enabled ? 'bg-orange-500' : 'bg-gray-200 dark:bg-gray-600'}`}>
+         <motion.div animate={{ x: enabled ? 24 : 0 }} className="w-4 h-4 bg-white rounded-full shadow-sm" />
+      </div>
+   </button>
+);
+
+// --- Story Navigation (Instagram Style) ---
+const StoryNav = ({ active, onClick, sections }: any) => (
+   <div className="flex gap-6 overflow-x-auto no-scrollbar py-8 px-4 mb-4">
+      {sections.map((s: any) => (
+         <button
+            key={s.id}
+            onClick={() => onClick(s.id)}
+            className="flex flex-col items-center gap-3 group shrink-0"
+         >
+            <div className={`w-20 h-20 rounded-full p-[4px] transition-all duration-500 transform ${active === s.id
+                  ? `bg-gradient-to-tr from-orange-600 via-orange-400 to-yellow-400 scale-110 shadow-xl shadow-orange-100`
+                  : 'bg-gray-100 dark:bg-gray-700 group-hover:scale-105'
+               }`}>
+               <div className={`w-full h-full rounded-full ${active === s.id ? 'bg-white' : 'bg-white dark:bg-gray-800'} flex items-center justify-center text-gray-800`}>
+                  <s.icon size={28} className={active === s.id ? 'text-orange-600' : 'text-gray-400 dark:text-gray-500'} />
+               </div>
+            </div>
+            <span className={`text-[10px] font-black uppercase tracking-[0.15em] ${active === s.id ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400'}`}>
+               {s.label.split(' ')[0]}
+            </span>
+         </button>
+      ))}
+   </div>
+);
+
+// --- Profile Card (LinkedIn Style) ---
+const ProfileHeader = ({ data, onBioGenerate, isGenerating, progress }: any) => (
+   <Card title="Professional Persona" description="Visual Identity & Bio" icon={User} badge="All-Star">
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-orange-600 to-orange-400 opacity-90" />
+      <div className="relative pt-16 flex flex-col md:flex-row items-end gap-6 mb-10">
+         <div className="relative group/avatar cursor-pointer">
+            <div className="w-32 h-32 rounded-full border-[6px] border-white dark:border-gray-800 shadow-2xl overflow-hidden bg-white">
+               <img src="https://i.pravatar.cc/300?u=preeti" className="w-full h-full object-cover" alt="Profile" />
+            </div>
+            <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center text-white">
+               <Camera size={24} />
+            </div>
+         </div>
+         <div className="flex-1 pb-2">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter leading-none mb-1">{data.name || 'Set Name'}</h2>
+            <p className="text-sm font-bold text-gray-500 flex items-center gap-2">
+               <Trophy size={14} className="text-orange-500" /> {data.careerInterest || 'No path selected'} • @{data.handle || 'handle'}
+            </p>
+         </div>
+         <div className="flex gap-3 pb-2">
+            <button className="px-8 py-3 bg-orange-600 text-white rounded-full font-black text-xs shadow-xl shadow-orange-200/50 hover:scale-105 transition-all">Verify Identity</button>
+            <button className="p-3 border-2 border-gray-100 dark:border-gray-700 rounded-full text-gray-400 hover:border-orange-200 hover:text-orange-500 transition-all"><MoreHorizontal size={22} /></button>
+         </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-10">
+         <div className="md:col-span-2 space-y-4">
+            <div className="flex justify-between items-center">
+               <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Bio Narrative</h4>
+               <button onClick={onBioGenerate} className="flex items-center gap-2 text-[10px] font-black text-orange-600 uppercase tracking-widest hover:scale-105 transition-all">
+                  {isGenerating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                  {isGenerating ? 'AI Thinking...' : 'AI Magic Bio'}
+               </button>
+            </div>
+            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-[1.8] italic">
+               "{data.bio || 'Your journey starts with a story. Let AI help you write it.'}"
+            </p>
+         </div>
+         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-[2rem] p-6 border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+            <div>
+               <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Strength</p>
+                  <span className="text-xs font-black text-orange-600">{progress}%</span>
+               </div>
+               <div className="w-full h-2.5 bg-white dark:bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-50 dark:border-gray-700">
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-gradient-to-r from-orange-600 via-orange-400 to-yellow-400" />
+               </div>
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 leading-tight mt-4">
+               Add {Math.ceil((100 - progress) / 20)} more items to reach All-Star status!
+            </p>
+         </div>
+      </div>
+   </Card>
+);
+
+// --- Main Hybrid Settings Component ---
 
 export default function Settings() {
-  const [activeSection, setActiveSection] = useState('profile');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [appLang, setAppLang] = useState<'en' | 'hi' | 'mr'>('en');
+   const [activeSection, setActiveSection] = useState('profile');
+   const [isSaving, setIsSaving] = useState(false);
+   const [showToast, setShowToast] = useState(false);
+   const [isGenerating, setIsGenerating] = useState(false);
+   const [toastMsg, setToastMsg] = useState('Settings saved to LocalStorage');
 
-  const t = (key: string, fallback: string) => translations[appLang]?.[key] || fallback;
+   // --- COMPREHENSIVE DATA STATE ---
+   const [formData, setFormData] = useState({
+      // Profile
+      name: 'Preeti Kumari',
+      email: 'preeti@eduadvisory.site',
+      handle: 'preeti_edu',
+      bio: 'Enthusiastic explorer of modern UI patterns and AI technologies. Building the future of education at EduAdvisory.',
+      careerInterest: 'Full-stack Engineering',
+      skills: ['React', 'Tailwind', 'Python', 'AI Research'],
+      // Security
+      twoFactorEnabled: true,
+      passStrength: 2,
+      loginAlerts: true,
+      // Notifications
+      emailAlerts: true,
+      pushAlerts: true,
+      scholarshipAlerts: true,
+      isDND: false,
+      dndStart: '22:00',
+      dndEnd: '07:00',
+      // Privacy
+      profileVisibility: 'public',
+      dataSharing: true,
+      activityTracking: true,
+      // Appearance
+      isDarkMode: false,
+      themeColor: 'orange',
+      fontSize: 'medium',
+      uiDensity: 'modern',
+      // Language & Region
+      language: 'English',
+      region: 'India (Maharashtra)',
+      timezone: 'GMT +5:30 (Auto)',
+      // Accessibility
+      highContrast: false,
+      motionReduction: false,
+      colorBlindFilter: 'None',
+      textScale: 100,
+   });
 
-  // Form State for Personal Information
-  const [formData, setFormData] = useState({
-    fullName: 'Ragini',
-    email: 'ragini@example.com',
-    bio: ''
-  });
+   // Init Data Sync
+   useEffect(() => {
+      const saved = localStorage.getItem('edu_settings_master_v1');
+      if (saved) {
+         try {
+            const parsed = JSON.parse(saved);
+            setFormData(prev => ({ ...prev, ...parsed }));
+         } catch (e) {
+            console.error("Storage corrupt", e);
+         }
+      }
+   }, []);
 
-  const sections: SettingSection[] = [
-    { id: 'profile', labelKey: 'profile', icon: User },
-    { id: 'security', labelKey: 'security', icon: Lock },
-    { id: 'notifications', labelKey: 'notifications', icon: Bell },
-    { id: 'privacy', labelKey: 'privacy', icon: Shield },
-    { id: 'appearance', labelKey: 'appearance', icon: Palette },
-    { id: 'language', labelKey: 'language', icon: Globe },
-    { id: 'connections', labelKey: 'connections', icon: LinkIcon },
-    { id: 'billing', labelKey: 'billing', icon: CreditCard },
-    { id: 'data', labelKey: 'data', icon: Database },
-    { id: 'accessibility', labelKey: 'accessibility', icon: Accessibility },
-  ];
+   const updateField = (field: string, value: any) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+   const handleSave = () => {
+      setIsSaving(true);
+      setTimeout(() => {
+         localStorage.setItem('edu_settings_master_v1', JSON.stringify(formData));
+         setIsSaving(false);
+         setToastMsg('Vault Updated Successfully');
+         setShowToast(true);
+         setTimeout(() => setShowToast(false), 3000);
+      }, 1200);
+   };
 
-  const handleSave = () => {
-    setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
-      alert(t('success', 'Settings saved successfully!'));
-    }, 1000);
-  };
+   const generateAIBio = () => {
+      setIsGenerating(true);
+      setTimeout(() => {
+         updateField('bio', "Human-centric developer with a deep passion for pedagogical technology. Merging the gap between code and career for thousands of students using advanced AI models and modern UI principles.");
+         setIsGenerating(false);
+      }, 1500);
+   };
 
-  return (
-    <div className={`max-w-6xl mx-auto h-full min-h-[calc(100vh-8rem)] flex flex-col lg:flex-row gap-8 pb-8 font-sans transition-colors duration-300 ${isDarkMode ? 'dark-theme' : ''}`}>
-      
-      {/* GLOBAL DARK MODE STYLES (Scoped to this component) */}
-      <style>{`
-        .dark-theme .bg-white { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
-        .dark-theme .bg-gray-50 { background-color: #334155 !important; border-color: #475569 !important; }
-        .dark-theme .bg-blue-50\\/50 { background-color: rgba(37, 99, 235, 0.15) !important; border-color: rgba(37, 99, 235, 0.3) !important; }
-        .dark-theme .bg-red-50\\/50 { background-color: rgba(239, 68, 68, 0.1) !important; border-color: rgba(239, 68, 68, 0.2) !important; }
-        
-        .dark-theme .text-gray-900 { color: #f8fafc !important; }
-        .dark-theme .text-gray-700 { color: #cbd5e1 !important; }
-        .dark-theme .text-gray-600 { color: #94a3b8 !important; }
-        .dark-theme .text-gray-500 { color: #94a3b8 !important; }
-        .dark-theme .text-gray-400 { color: #64748b !important; }
-        .dark-theme .text-blue-900 { color: #60a5fa !important; }
-        
-        .dark-theme .border-gray-50, .dark-theme .border-gray-100, .dark-theme .border-gray-200 { border-color: #475569 !important; }
-        
-        .dark-theme input, .dark-theme textarea { background-color: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
-        .dark-theme input::placeholder, .dark-theme textarea::placeholder { color: #64748b !important; }
-      `}</style>
+   const sections = [
+      { id: 'profile', label: 'Identity', icon: User, desc: 'Profile & Handle' },
+      { id: 'security', label: 'Safety', icon: Shield, desc: 'Vault & 2FA' },
+      { id: 'notifications', label: 'Vibe', icon: Bell, desc: 'DND & Alerts' },
+      { id: 'privacy', label: 'Stealth', icon: ShieldCheck, desc: 'Visibility & Data' },
+      { id: 'appearance', label: 'Design', icon: Palette, desc: 'Theme & Font' },
+      { id: 'language', label: 'Locale', icon: Languages, desc: 'Region & Time' },
+      { id: 'connections', label: 'Linked', icon: LinkIcon, desc: 'Social SSO' },
+      { id: 'billing', label: 'Plan', icon: Crown, desc: 'Tiers & Subs' },
+      { id: 'data', label: 'Cloud', icon: Database, desc: 'Export & Wipe' },
+      { id: 'accessibility', label: 'Assist', icon: Accessibility, desc: 'Helper Tools' },
+   ];
 
-      {/* Sidebar Navigation */}
-      <div className="w-full lg:w-72 shrink-0 space-y-2">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 px-2">{t('settings', 'Settings')}</h1>
-        <div className="space-y-1">
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              className={`w-full flex items-center justify-between p-3.5 rounded-xl transition-all group ${
-                activeSection === section.id 
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+   const calculateProgress = () => {
+      let score = 20;
+      if (formData.name !== 'Set Name') score += 20;
+      if (formData.bio && formData.bio.length > 30) score += 20;
+      if (formData.skills.length >= 3) score += 20;
+      if (formData.twoFactorEnabled) score += 20;
+      return Math.min(100, score);
+   };
+
+   return (
+      <div className={`max-w-7xl mx-auto min-h-screen p-4 md:p-8 font-sans transition-colors duration-700 ${formData.isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50/30'} pb-40`}>
+
+         {/* YouTube Studio Header */}
+         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 px-2">
+            <div className="flex items-center gap-5">
+               <motion.div
+                  whileHover={{ rotate: 90 }}
+                  className={`w-14 h-14 rounded-[1.5rem] bg-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-900/20`}
+               >
+                  <SettingsIcon size={28} />
+               </motion.div>
+               <div>
+                  <h1 className={`text-4xl font-black tracking-tighter leading-none mb-1 ${formData.isDarkMode ? 'text-white' : 'text-gray-900'}`}>Command Center</h1>
+                  <div className="flex items-center gap-2">
+                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                     <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Engine Version 2.0.4 • Active Sync</p>
+                  </div>
+               </div>
+            </div>
+            <div className="flex-1 max-w-xl relative group">
+               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-orange-500 transition-colors" size={20} />
+               <input
+                  type="text"
+                  placeholder="Search setting, mode, or command..."
+                  className={`w-full h-14 pl-16 pr-6 ${formData.isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'} rounded-[2rem] shadow-sm outline-none focus:ring-4 focus:ring-orange-500/10 border-2 transition-all font-bold text-sm`}
+               />
+            </div>
+            <div className="flex items-center gap-4">
+               <div className={`w-14 h-14 rounded-full ring-4 ring-white dark:ring-gray-700 shadow-xl overflow-hidden`}>
+                  <img src="https://i.pravatar.cc/100?u=preeti" className="w-full h-full object-cover" alt="User" />
+               </div>
+            </div>
+         </header>
+
+         <div className="flex flex-col lg:flex-row gap-12">
+
+            {/* Main Workspace */}
+            <div className="flex-1 min-w-0">
+
+               <StoryNav active={activeSection} onClick={setActiveSection} sections={sections} />
+
+               <AnimatePresence mode="wait">
+                  <motion.div
+                     key={activeSection}
+                     initial={{ opacity: 0, x: 40 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     exit={{ opacity: 0, x: -40 }}
+                     transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                  >
+
+                     {/* SECTION 1: PROFILE */}
+                     {activeSection === 'profile' && (
+                        <>
+                           <ProfileHeader data={formData} onBioGenerate={generateAIBio} isGenerating={isGenerating} progress={calculateProgress()} />
+
+                           <Card title="Quick Interface" description="Instant Design Toggles" icon={Zap}>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                                 {[
+                                    { l: 'Dark Mode', i: Moon, v: formData.isDarkMode, f: 'isDarkMode' },
+                                    { l: 'Silent Mode', i: Volume2, v: formData.isDND, f: 'isDND' },
+                                    { l: 'High Contrast', i: Contrast, v: formData.highContrast, f: 'highContrast' },
+                                    { l: 'Privacy Mode', i: ViewIcon, v: formData.profileVisibility === 'private', f: 'profileVisibility', custom: true },
+                                 ].map((item: any) => (
+                                    <button
+                                       key={item.f}
+                                       onClick={() => updateField(item.f, item.custom ? (item.v ? 'public' : 'private') : !item.v)}
+                                       className={`h-32 rounded-[2.5rem] p-5 flex flex-col justify-between items-start transition-all relative overflow-hidden isolate ${item.v ? 'bg-orange-600 text-white shadow-xl rotate-1' : 'bg-gray-50 dark:bg-gray-900/50 text-gray-400 border border-gray-100 dark:border-gray-700 hover:rotate-1'}`}
+                                    >
+                                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.v ? 'bg-white/20' : 'bg-white dark:bg-gray-800 shadow-sm'}`}>
+                                          <item.i size={20} />
+                                       </div>
+                                       <span className="text-[10px] font-black uppercase tracking-widest">{item.l}</span>
+                                       <div className="absolute -right-4 -bottom-4 opacity-5 -z-10"><item.i size={72} /></div>
+                                    </button>
+                                 ))}
+                              </div>
+                           </Card>
+
+                           <Card title="Data Fields" description="Editable User Metadata" icon={Database}>
+                              <div className="grid md:grid-cols-2 gap-8">
+                                 <div className="space-y-2 group">
+                                    <label className="text-[11px] font-black text-gray-400 group-focus-within:text-orange-500 transition-colors uppercase tracking-[0.2em] pl-1">Handle Alias</label>
+                                    <div className="relative">
+                                       <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black">@</span>
+                                       <input
+                                          type="text"
+                                          value={formData.handle}
+                                          onChange={(e) => updateField('handle', e.target.value)}
+                                          className={`w-full pl-12 pr-6 py-4 rounded-2xl border-2 font-black ${formData.isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-transparent text-gray-900'} focus:border-orange-500 outline-none transition-all`}
+                                       />
+                                    </div>
+                                 </div>
+                                 <div className="space-y-2 group">
+                                    <label className="text-[11px] font-black text-gray-400 group-focus-within:text-orange-500 transition-colors uppercase tracking-[0.2em] pl-1">Primary Interest</label>
+                                    <select
+                                       value={formData.careerInterest}
+                                       onChange={(e) => updateField('careerInterest', e.target.value)}
+                                       className={`w-full px-6 py-4 rounded-2xl border-2 font-black ${formData.isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-transparent text-gray-900'} focus:border-orange-500 outline-none transition-all appearance-none cursor-pointer`}
+                                    >
+                                       <option>Full-stack Engineering</option>
+                                       <option>UI/UX Experience Design</option>
+                                       <option>Data Science & AI</option>
+                                       <option>Product Management</option>
+                                    </select>
+                                 </div>
+                              </div>
+                           </Card>
+                        </>
+                     )}
+
+                     {/* SECTION 2: SECURITY */}
+                     {activeSection === 'security' && (
+                        <Card title="Security Protocols" description="Vault Protection & Auth" icon={Shield}>
+                           <div className="space-y-8">
+                              <div className="p-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] text-white relative isolate overflow-hidden">
+                                 <div className="absolute top-0 right-0 p-10 opacity-10 -z-10"><Lock size={120} /></div>
+                                 <div className="flex flex-col md:flex-row justify-between items-center gap-10">
+                                    <div>
+                                       <h4 className="text-2xl font-black mb-1">Two-Factor Authentication</h4>
+                                       <p className="text-sm text-gray-400 font-medium">Ultimate protection via Google Authenticator app.</p>
+                                       <div className="flex gap-2 mt-4 text-[10px] items-center text-green-400 font-black uppercase tracking-widest">
+                                          <ShieldCheck size={14} /> Master Key Synced
+                                       </div>
+                                    </div>
+                                    <button className="px-10 py-4 bg-white text-gray-900 rounded-[1.5rem] font-black text-sm shadow-xl active:scale-95 transition-all">Configure 2FA</button>
+                                 </div>
+                              </div>
+                              <div className="grid md:grid-cols-2 gap-10">
+                                 <div className="space-y-4">
+                                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1">Login Activity</h4>
+                                    <div className="space-y-3">
+                                       <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                                          <div className="flex items-center gap-3">
+                                             <Smartphone size={18} className="text-orange-600" />
+                                             <div>
+                                                <p className="text-[13px] font-black dark:text-white">Windows Desktop</p>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase">Mumbai, IN • Online</p>
+                                             </div>
+                                          </div>
+                                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div className="space-y-4">
+                                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1">Danger Zone</h4>
+                                    <button className="w-full h-[116px] border-4 border-dashed border-red-100 dark:border-red-900/30 rounded-[2.5rem] flex flex-col items-center justify-center gap-2 group hover:border-red-500 transition-all">
+                                       <Trash2 size={24} className="text-red-300 group-hover:text-red-500" />
+                                       <span className="text-[10px] font-black text-red-300 uppercase tracking-widest group-hover:text-red-500">Log out all devices</span>
+                                    </button>
+                                 </div>
+                              </div>
+                           </div>
+                        </Card>
+                     )}
+
+                     {/* FALLBACK FOR WIP SECTIONS */}
+                     {!['profile', 'security', 'accessibility'].includes(activeSection) && (
+                        <Card title={sections.find(s => s.id === activeSection)?.label} description={sections.find(s => s.id === activeSection)?.desc} icon={sections.find(s => s.id === activeSection)?.icon}>
+                           <div className="py-20 text-center space-y-8">
+                              <div className="w-24 h-24 bg-orange-600 rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl animate-bounce-slow mx-auto">
+                                 <Zap size={40} />
+                              </div>
+                              <div className="space-y-3">
+                                 <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">Sync Interface Live</h3>
+                                 <p className="text-sm font-medium text-gray-500 max-w-sm mx-auto leading-relaxed">
+                                    This module is optimized for real-time career data. All current inputs are synced to your secure cloud.
+                                 </p>
+                              </div>
+                              <button onClick={() => setActiveSection('profile')} className="px-10 py-4 bg-gray-900 text-white rounded-full font-black text-xs hover:scale-105 transition-all shadow-xl">Back to Profile</button>
+                           </div>
+                        </Card>
+                     )}
+
+                  </motion.div>
+               </AnimatePresence>
+            </div>
+
+            {/* Studio Sidebar */}
+            <aside className="w-full lg:w-96 shrink-0 space-y-8 lg:sticky lg:top-8 h-fit">
+               <div className={`p-8 rounded-[3rem] border shadow-2xl relative overflow-hidden isolate ${formData.isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
+                  <h4 className="text-[11px] font-black text-orange-600 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+                     <Zap size={14} /> System Health
+                  </h4>
+                  <div className="space-y-6">
+                     <div>
+                        <div className="flex justify-between items-center mb-3">
+                           <p className="text-xs font-black uppercase tracking-widest">Global Sync</p>
+                           <span className="text-[10px] font-black text-green-500 uppercase">Live</span>
+                        </div>
+                        <div className="w-full h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                           <motion.div initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ repeat: Infinity, duration: 2 }} className="w-1/3 h-full bg-orange-600 rounded-full" />
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-gradient-to-br from-orange-600 to-orange-400 rounded-[3rem] p-10 text-white shadow-3xl shadow-orange-900/40 relative group overflow-hidden isolate">
+                  <div className="absolute top-0 right-0 p-10 opacity-30 -z-10 transition-transform group-hover:scale-125 duration-700"><Crown size={120} /></div>
+                  <h3 className="text-3xl font-black mb-2 tracking-tighter">Unlimited Access</h3>
+                  <p className="text-sm font-medium text-orange-50 mb-8 opacity-90 leading-relaxed">Join 42,000+ students on Premium. Access advanced AI analyzers.</p>
+                  <button className="w-full py-5 bg-white text-orange-600 rounded-[1.5rem] font-black text-sm shadow-2xl hover:-translate-y-1 transition-all">Upgrade Now</button>
+               </div>
+            </aside>
+
+         </div>
+
+         {/* --- RE-DESIGNED COMPACT FLOATING SAVE BUTTON (NO LONGER A SNAKE) --- */}
+         <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="fixed bottom-12 right-12 z-50 flex items-center gap-4"
+         >
+            <AnimatePresence>
+               {isSaving && (
+                  <motion.div
+                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+                     className="bg-gray-900 text-white px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl border border-white/10"
+                  >
+                     Saving to Vault...
+                  </motion.div>
+               )}
+            </AnimatePresence>
+
+            <motion.button
+               onClick={handleSave}
+               disabled={isSaving}
+               whileHover={{ scale: 1.1, rotate: 5 }}
+               whileTap={{ scale: 0.9 }}
+               className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_20px_40px_rgba(234,88,12,0.4)] transition-all ${isSaving ? 'bg-gray-400' : 'bg-orange-600 hover:bg-orange-700'}`}
             >
-              <div className="flex items-center gap-3">
-                <section.icon size={20} className={activeSection === section.id ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'} />
-                <span className="font-bold text-sm">{t(section.labelKey, section.labelKey)}</span>
-              </div>
-              <ChevronRight size={16} className={activeSection === section.id ? 'opacity-100 text-white' : 'opacity-0'} />
-            </button>
-          ))}
-        </div>
+               {isSaving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+               <span className="sr-only">Save Changes</span>
+            </motion.button>
+         </motion.div>
+
+         {/* Notification Portal */}
+         <AnimatePresence>
+            {showToast && (
+               <motion.div
+                  initial={{ opacity: 0, y: -20, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                  className={`fixed top-32 left-1/2 -translate-x-1/2 z-50 ${formData.isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} px-10 py-6 rounded-[3rem] shadow-3xl flex items-center gap-6 border-2`}
+               >
+                  <div className="w-12 h-12 bg-green-500 text-white rounded-2xl flex items-center justify-center shadow-lg"><CheckCircle2 size={24} /></div>
+                  <div>
+                     <p className={`text-lg font-black leading-none mb-1 ${formData.isDarkMode ? 'text-white' : 'text-gray-900'}`}>{toastMsg}</p>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Handshake confirmed • 86ms</p>
+                  </div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
       </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[600px] transition-colors duration-300">
-        <div className="flex-1 overflow-y-auto p-8 md:p-10 custom-scrollbar">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSection}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-8"
-            >
-              {/* Profile Settings */}
-              {activeSection === 'profile' && (
-                <div className="space-y-8">
-                  {/* Profile Header */}
-                  <div className="flex items-center gap-6 pb-8 border-b border-gray-50">
-                    <div className="relative group cursor-pointer">
-                      <img 
-                        src="https://picsum.photos/seed/ragini/150/150" 
-                        alt="Profile" 
-                        className="w-24 h-24 rounded-[1.25rem] object-cover shadow-sm border border-gray-100"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-black/50 rounded-[1.25rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold">
-                        {t('change_photo', 'Change')}
-                      </div>
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">{t('personal_info', 'Personal Information')}</h2>
-                      <p className="text-sm text-gray-500 font-medium mt-1">{t('update_photo', 'Update your photo and personal details.')}</p>
-                    </div>
-                  </div>
-
-                  {/* Form Fields */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2.5">
-                      <label className="block text-sm font-bold text-gray-700">{t('full_name', 'Full Name')}</label>
-                      <input 
-                        type="text" 
-                        name="fullName"
-                        value={formData.fullName} 
-                        onChange={handleInputChange}
-                        className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm text-gray-900 font-medium shadow-sm" 
-                      />
-                    </div>
-                    <div className="space-y-2.5">
-                      <label className="block text-sm font-bold text-gray-700">{t('email', 'Email Address')}</label>
-                      <input 
-                        type="email" 
-                        name="email"
-                        value={formData.email} 
-                        onChange={handleInputChange}
-                        className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm text-gray-900 font-medium shadow-sm" 
-                      />
-                    </div>
-                    <div className="md:col-span-2 space-y-2.5">
-                      <label className="block text-sm font-bold text-gray-700">{t('bio', 'Bio')}</label>
-                      <textarea 
-                        rows={5} 
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleInputChange}
-                        className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none resize-none text-sm text-gray-900 font-medium shadow-sm" 
-                        placeholder={t('bio_placeholder', 'Tell us about yourself...')} 
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Security Settings */}
-              {activeSection === 'security' && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{t('security_title', 'Security')}</h2>
-                    <p className="text-sm text-gray-500 mt-1 font-medium">{t('security_desc', 'Manage your password and account security.')}</p>
-                  </div>
-
-                  <div className="space-y-8">
-                    <div className="space-y-4 border-b border-gray-50 pb-8">
-                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('change_password', 'Change Password')}</h3>
-                      <div className="space-y-4 max-w-md">
-                        <div className="relative">
-                          <input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder={t('curr_pass', 'Current Password')} 
-                            className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm shadow-sm" 
-                          />
-                          <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        </div>
-                        <input type="password" placeholder={t('new_pass', 'New Password')} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm shadow-sm" />
-                        <input type="password" placeholder={t('conf_pass', 'Confirm New Password')} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm shadow-sm" />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-blue-100">
-                          <Shield className="text-blue-600" size={20} />
-                        </div>
-                        <div>
-                          <p className="font-bold text-blue-900 text-sm">{t('two_factor', 'Two-Factor Authentication')}</p>
-                          <p className="text-xs text-blue-600 mt-0.5 font-medium">{t('two_factor_desc', 'Add an extra layer of security to your account.')}</p>
-                        </div>
-                      </div>
-                      <button className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-colors">
-                        {t('enable', 'Enable')}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Appearance Settings */}
-              {activeSection === 'appearance' && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{t('appearance_title', 'Appearance')}</h2>
-                    <p className="text-sm text-gray-500 mt-1 font-medium">{t('appearance_desc', 'Customize how the application looks to you.')}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 max-w-md">
-                    <button 
-                      onClick={() => setIsDarkMode(false)}
-                      className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${!isDarkMode ? 'border-blue-600 bg-blue-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200'}`}
-                    >
-                      <Sun size={32} className={!isDarkMode ? 'text-blue-600' : 'text-gray-400'} />
-                      <span className={`font-bold text-sm ${!isDarkMode ? 'text-blue-900' : 'text-gray-500'}`}>{t('light_mode', 'Light Mode')}</span>
-                    </button>
-                    <button 
-                      onClick={() => setIsDarkMode(true)}
-                      className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${isDarkMode ? 'border-blue-600 bg-blue-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200'}`}
-                    >
-                      <Moon size={32} className={isDarkMode ? 'text-blue-600' : 'text-gray-400'} />
-                      <span className={`font-bold text-sm ${isDarkMode ? 'text-blue-900' : 'text-gray-500'}`}>{t('dark_mode', 'Dark Mode')}</span>
-                    </button>
-                  </div>
-
-                  <div className="space-y-4 pt-4">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('accent_color', 'Accent Color')}</h3>
-                    <div className="flex gap-4">
-                      {['#2563eb', '#10b981', '#f97316', '#ef4444', '#8b5cf6'].map((color) => (
-                        <button 
-                          key={color} 
-                          className="w-10 h-10 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white hover:scale-110 transition-transform"
-                          style={{ backgroundColor: color }}
-                        >
-                          {color === '#2563eb' && <Check size={18} strokeWidth={3} />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Language Settings */}
-              {activeSection === 'language' && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{t('lang_title', 'Language & Region')}</h2>
-                    <p className="text-sm text-gray-500 mt-1 font-medium">{t('lang_desc', 'Choose your preferred language for the interface.')}</p>
-                  </div>
-
-                  <div className="grid gap-4 max-w-md">
-                    {[
-                      { code: 'en', name: 'English', native: 'English' },
-                      { code: 'hi', name: 'Hindi', native: 'हिंदी' },
-                      { code: 'mr', name: 'Marathi', native: 'मराठी' }
-                    ].map(l => (
-                      <button 
-                        key={l.code}
-                        onClick={() => setAppLang(l.code as 'en' | 'hi' | 'mr')}
-                        className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${
-                          appLang === l.code ? 'border-blue-600 bg-blue-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200'
-                        }`}
-                      >
-                        <div className="flex flex-col text-left">
-                          <span className={`font-bold text-base ${appLang === l.code ? 'text-blue-900' : 'text-gray-900'}`}>{l.native}</span>
-                          <span className="text-xs text-gray-500 mt-0.5 font-medium">{l.name}</span>
-                        </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${appLang === l.code ? 'border-blue-600' : 'border-gray-300'}`}>
-                          {appLang === l.code && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Data Management */}
-              {activeSection === 'data' && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{t('data_title', 'Data Management')}</h2>
-                    <p className="text-sm text-gray-500 mt-1 font-medium">{t('data_desc', 'Control your data and export your information.')}</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="p-6 bg-white rounded-2xl border border-gray-100 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
-                          <Download size={18} className="text-gray-500" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-sm">{t('export_data', 'Export Personal Data')}</p>
-                          <p className="text-xs text-gray-500 mt-0.5 font-medium">{t('export_desc', 'Download a copy of all your data in JSON format.')}</p>
-                        </div>
-                      </div>
-                      <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors shadow-sm text-gray-700">{t('export_btn', 'Export')}</button>
-                    </div>
-
-                    <div className="p-6 bg-red-50/50 rounded-2xl border border-red-100 flex items-center justify-between transition-colors hover:bg-red-50">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-red-100 shadow-sm">
-                          <Trash2 size={18} className="text-red-500" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-red-700 text-sm">{t('delete_acc', 'Delete Account')}</p>
-                          <p className="text-xs text-red-500 mt-0.5 font-medium">{t('delete_desc', 'Permanently delete your account and all associated data.')}</p>
-                        </div>
-                      </div>
-                      <button className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors shadow-sm shadow-red-600/20">{t('delete_btn', 'Delete')}</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Placeholder for other sections */}
-              {!['profile', 'security', 'appearance', 'language', 'data'].includes(activeSection) && (
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-20 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
-                  <div className="w-20 h-20 bg-white shadow-sm rounded-full flex items-center justify-center text-gray-400 border border-gray-100">
-                    <AlertCircle size={32} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{t(sections.find(s => s.id === activeSection)?.labelKey || '', sections.find(s => s.id === activeSection)?.labelKey || '')}</h3>
-                    <p className="text-sm font-medium text-gray-500 max-w-xs mx-auto leading-relaxed">{t('under_dev', 'This section is currently under development. Check back soon for more features!')}</p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="p-6 md:px-10 bg-gray-50/50 border-t border-gray-100 flex justify-end items-center gap-4 shrink-0 transition-colors duration-300">
-          <button className="px-6 py-2.5 text-sm text-gray-600 font-bold hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
-            {t('cancel', 'Cancel')}
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-8 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0"
-          >
-            {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-            {isSaving ? t('saving', 'Saving...') : t('save', 'Save Changes')}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+   );
 }

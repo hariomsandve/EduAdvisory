@@ -10,86 +10,71 @@ import RoleSelection, { UserRole } from './components/RoleSelection';
 import InterestSelection from './components/InterestSelection';
 import CareerQuiz from './components/CareerQuiz';
 import AuthPage from './components/AuthPage';
-import Dashboard from './components/Dashboard';
+import ParentAuthPage from './components/ParentAuthPage';
+import Dashboard from './components/Dashboard'; // ✅ FIXED IMPORT
 import ParentDashboard from './components/ParentDashboard';
-import TeacherDashboard from './components/TeacherDashboard';
 import QuizResult from './components/QuizResult';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppView =
-  | 'loading'
-  | 'landing'
-  | 'roleSelection'
-  | 'interestSelection'
-  | 'careerQuiz'
-  | 'auth'
-  | 'dashboard'
-  | 'quizResult';
+type AppView = 'loading' | 'landing' | 'roleSelection' | 'interestSelection' | 'careerQuiz' | 'auth' | 'parentAuth' | 'dashboard' | 'quizResult';
 
 export default function App() {
   const [view, setView] = useState<AppView>('loading');
   const [role, setRole] = useState<UserRole | null>(null);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
-  const [userData, setUserData] = useState<{
+  const [flowSource, setFlowSource] = useState<'normal' | 'signup'>('normal');
+  const [userData, setUserData] = useState<{ 
     userName?: string;
-    selectedClass?: string;
+    userEmail?: string;
+    selectedClass?: string; 
     selectedInterests?: string[];
     quizCompleted?: boolean;
     quizResults?: any;
   }>({});
-
+  
   const [registeredUsers, setRegisteredUsers] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem('registeredUsers');
     return saved ? JSON.parse(saved) : {};
   });
 
-  // 🔹 ROLE SELECT
   const handleRoleSelect = (selectedRole: UserRole) => {
     setRole(selectedRole);
     setAuthMode('signup');
-    setView('auth');
+    setFlowSource('signup');
+    if (selectedRole === 'parent') {
+      setView('parentAuth');
+    } else {
+      setView('auth');
+    }
   };
 
-  // 🔹 INTEREST COMPLETE
-  const handleInterestComplete = (data: {
-    selectedClass: string;
-    selectedInterests: string[];
-  }) => {
-    setUserData((prev) => ({ ...prev, ...data }));
+  const handleInterestComplete = (data: { selectedClass: string; selectedInterests: string[] }) => {
+    setUserData(prev => ({ ...prev, ...data }));
     setView('careerQuiz');
   };
 
-  // 🔹 QUIZ COMPLETE
   const handleQuizComplete = (results: any) => {
-    setUserData((prev) => ({
-      ...prev,
-      quizResults: results,
-      quizCompleted: true,
-    }));
+    setUserData(prev => ({ ...prev, quizResults: results, quizCompleted: true }));
     setView('quizResult');
   };
 
-  // 🔹 QUIZ SKIP
   const handleQuizSkip = () => {
-    setUserData((prev) => ({ ...prev, quizCompleted: false }));
+    setUserData(prev => ({ ...prev, quizCompleted: false }));
     setView('dashboard');
   };
 
-  // 🔹 AUTH START
   const handleAuthStart = (mode: 'login' | 'signup') => {
+    setFlowSource('normal');
     setAuthMode(mode);
     setView('auth');
   };
 
   const handleSignUpClick = () => {
+    setFlowSource('signup');
     setView('roleSelection');
   };
 
-  // 🔹 AUTH SUCCESS (🔥 FIXED LOGIC)
-  const handleAuthSuccess = (
-    mode: 'login' | 'signup',
-    data: { name?: string; email: string }
-  ) => {
+  const handleAuthSuccess = (mode: 'login' | 'signup', data: { name?: string; email: string }) => {
     let currentUserName = data.name;
 
     if (mode === 'signup' && data.name && data.email) {
@@ -102,29 +87,29 @@ export default function App() {
       if (storedName) {
         currentUserName = storedName;
       } else {
+        // Capitalize the prefix as a nice fallback
         const prefix = data.email.split('@')[0];
-        currentUserName =
-          prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        currentUserName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
       }
     }
 
-    if (currentUserName) {
-      setUserData((prev) => ({ ...prev, userName: currentUserName }));
-    }
-
-    // ✅ FINAL FLOW FIX
-    if (mode === 'login') {
+    setUserData(prev => ({ 
+      ...prev, 
+      userName: currentUserName || prev.userName,
+      userEmail: data.email 
+    }));
+    
+    if (role === 'parent' || mode === 'login') {
       setView('dashboard');
     } else {
-      if (role === 'parent' || role === 'teacher') {
-        setView('dashboard');
-      } else {
+      if (flowSource === 'signup') {
         setView('interestSelection');
+      } else {
+        setView('roleSelection');
       }
     }
   };
 
-  // 🔹 LOGOUT
   const handleLogout = () => {
     setUserData({});
     setView('landing');
@@ -133,8 +118,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-900">
       <AnimatePresence mode="wait">
-
-        {/* 🔹 LOADING */}
         {view === 'loading' && (
           <motion.div
             key="loading"
@@ -146,7 +129,6 @@ export default function App() {
           </motion.div>
         )}
 
-        {/* 🔹 LANDING */}
         {view === 'landing' && (
           <motion.div
             key="landing"
@@ -155,14 +137,13 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <LandingPage
+            <LandingPage 
               onAuth={handleAuthStart}
               onSignUpClick={handleSignUpClick}
             />
           </motion.div>
         )}
 
-        {/* 🔹 AUTH */}
         {view === 'auth' && (
           <motion.div
             key="auth"
@@ -171,7 +152,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <AuthPage
+            <AuthPage 
               initialMode={authMode}
               onBack={() => setView('landing')}
               onSuccess={handleAuthSuccess}
@@ -179,27 +160,60 @@ export default function App() {
           </motion.div>
         )}
 
-        {/* 🔹 ROLE SELECTION */}
-        {view === 'roleSelection' && (
-          <motion.div key="roleSelection" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <RoleSelection
-              onSelect={handleRoleSelect}
-              onBack={() => setView('landing')}
+        {view === 'parentAuth' && (
+          <motion.div
+            key="parentAuth"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ParentAuthPage 
+              initialMode={authMode}
+              onBack={() => setView('roleSelection')}
+              onSuccess={handleAuthSuccess}
             />
           </motion.div>
         )}
 
-        {/* 🔹 INTEREST */}
-        {view === 'interestSelection' && (
-          <motion.div key="interestSelection" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <InterestSelection onComplete={handleInterestComplete} />
+        {view === 'roleSelection' && (
+          <motion.div
+            key="roleSelection"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <RoleSelection 
+              onSelect={handleRoleSelect} 
+              onBack={() => setView('landing')} 
+            />
           </motion.div>
         )}
 
-        {/* 🔹 QUIZ */}
+        {view === 'interestSelection' && (
+          <motion.div
+            key="interestSelection"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <InterestSelection 
+              onComplete={handleInterestComplete}
+            />
+          </motion.div>
+        )}
+
         {view === 'careerQuiz' && (
-          <motion.div key="careerQuiz" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <CareerQuiz
+          <motion.div
+            key="careerQuiz"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <CareerQuiz 
               userData={userData as any}
               onComplete={handleQuizComplete}
               onSkip={handleQuizSkip}
@@ -207,39 +221,44 @@ export default function App() {
           </motion.div>
         )}
 
-        {/* 🔹 QUIZ RESULT */}
         {view === 'quizResult' && (
-          <motion.div key="quizResult" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <QuizResult
+          <motion.div
+            key="quizResult"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <QuizResult 
               onDashboard={() => setView('dashboard')}
               onRetake={() => setView('careerQuiz')}
             />
           </motion.div>
         )}
 
-        {/* 🔹 DASHBOARD */}
         {view === 'dashboard' && (
-          <motion.div key="dashboard" className="w-full h-screen">
+          <motion.div
+            key="dashboard"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-screen"
+          >
+            {/* ✅ Routed to the correct dashboard based on role */}
             {role === 'parent' ? (
-              <ParentDashboard
-                userName={userData.userName}
-                onLogout={handleLogout}
-              />
-            ) : role === 'teacher' ? (
-              <TeacherDashboard
+              <ParentDashboard 
                 userName={userData.userName}
                 onLogout={handleLogout}
               />
             ) : (
-              <Dashboard
-                onNavigate={(view) => setView(view as AppView)}
-                onLogout={handleLogout}
-                userName={userData.userName}
+              <Dashboard 
+                onNavigate={(view) => setView(view as AppView)}  
+                onLogout={handleLogout} 
+                userName={userData.userName} 
+                userEmail={userData.userEmail}
               />
             )}
           </motion.div>
         )}
-
       </AnimatePresence>
     </div>
   );

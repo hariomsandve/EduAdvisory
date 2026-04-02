@@ -84,179 +84,11 @@ export default function CareerRoadmap() {
     // ==========================================
     // 1. STEM & TECHNOLOGY
     // ==========================================
-    { 
-      id: 'cs-it', 
-      title: 'Computer Science & IT (SDE Roadmap)', 
-      group: 'STEM & Technology', 
-      icon: Server, 
-      color: 'bg-blue-600', 
-      description: '🚀 Complete SDE Roadmap (From 12th → Job). Focused on BCA/B.Tech students aiming for software engineering roles.', 
-      salary: '₹6L - ₹30L', 
-      growth: 'High', 
-      steps: [
-        {
-          id: 'step1',
-          title: 'PHASE 1: Foundation Phase (After 12th)',
-          description: '📌 Choose Your Path: BCA/B.Tech focus = skills > degree.\n\n💻 Learn Programming Basics (C++ or Python):\n• Variables, loops, conditions\n• Functions\n• Arrays & Strings\n• Pointers (important in C++)\n\n👉 Goal: Write basic programs without thinking much.',
-          icon: BookOpen,
-          duration: '0-6 Months',
-          skills: ['C++', 'Python', 'Basic Logic']
-        },
-        {
-          id: 'step2',
-          title: 'PHASE 2: Core Problem Solving (DSA)',
-          description: '📚 Learn in this order:\n• Time & Space Complexity\n• Arrays & Strings\n• Recursion & Linked List\n• Stack, Queue, Trees & Hashing\n\n👉 Platforms: LeetCode, CodeChef, GeeksforGeeks\n👉 Target: Solve 300–500 problems.',
-          icon: Brain,
-          duration: '6-12 Months',
-          skills: ['Data Structures', 'Algorithms']
-        },
-        {
-          id: 'step3',
-          title: 'PHASE 3: Development Skills',
-          description: '🔥 Option A: Web Dev (Recommended)\nHTML/CSS/JS, React.js, Node.js + Express, MongoDB/MySQL. Build: Portfolio, Chat app, Student System, EduAdvisory.\n\n📱 Option B: App Dev (Flutter/React Native)\n🤖 Option C: AI/ML (Python, NumPy, Pandas)',
-          icon: Layout,
-          duration: '6-12 Months',
-          skills: ['React.js', 'Node.js', 'MongoDB']
-        },
-        {
-          id: 'step4',
-          title: 'PHASE 4: Projects + Resume',
-          description: 'Build 3–5 Strong Projects:\n• Full-stack project (must)\n• API-based project\n• One unique project (AI/chatbot etc.)\n\n👉 Example: Upgrade C++ chatbot with AI, or build a study app MVP.',
-          icon: Code,
-          duration: '2-4 Months',
-          skills: ['System Design', 'APIs', 'Git/GitHub']
-        },
-        {
-          id: 'step5',
-          title: 'PHASE 5: Internships + Hackathons',
-          description: 'Apply on:\n• Internshala, LinkedIn, Wellfound\n\nParticipate in:\n• Hackathons & Ideathons\n\n👉 Goal: 1–2 internships before final year.',
-          icon: Briefcase,
-          duration: 'Parallel'
-        },
-        {
-          id: 'step6',
-          title: 'PHASE 6: Placement Prep',
-          description: 'Focus on:\n• DSA revision & basic System Design\n• DBMS, OS, Computer Networks (basics)\n\nPractice:\n• Mock interviews & Resume building',
-          icon: Award,
-          exams: ['Mock Interviews'],
-          skills: ['System Design', 'DBMS', 'OS', 'CN']
-        },
-        {
-          id: 'step7',
-          title: '⏳ FINAL TIMELINE (Simple View)',
-          description: '• 1st Year: Programming + Basics\n• 2nd Year: DSA + Projects\n• 3rd Year: Internships + Advanced + Placement',
-          icon: GraduationCap,
-          duration: '3 Years Overview'
-        }
-      ]
-    },
-    { 
-      id: 'ai-ml', 
-      title: 'Artificial Intelligence & Machine Learning', 
-      group: 'STEM & Technology', 
-      icon: Brain, 
-      color: 'bg-purple-600', 
-      description: 'Focus on building intelligent systems, data-driven models, and automation.', 
-      salary: '₹5L - ₹25L', 
-      growth: 'Very High', 
-      steps: [
-        {
-          id: 'step1',
-          title: 'Foundations & Education',
-          description: 'Learn Python, mathematics (statistics, probability, linear algebra), and basic programming concepts.',
-          icon: BookOpen,
-          duration: '3-4 Years'
-        },
-        {
-          id: 'step2',
-          title: 'Specialized Skills',
-          description: 'Master machine learning algorithms, deep learning, data preprocessing, and tools like TensorFlow, PyTorch.',
-          icon: Code,
-          duration: '6-12 Months'
-        },
-        {
-          id: 'step3',
-          title: 'Practical Experience',
-          description: 'Build ML models, work on datasets, participate in Kaggle, and create real-world AI projects.',
-          icon: Briefcase,
-          duration: '6-12 Months'
-        },
-        {
-          id: 'step4',
-          title: 'Professional Career',
-          description: 'Enter the industry as a Machine Learning Engineer, Data Scientist, or AI Engineer.',
-          icon: Award
-        }
-      ]
-    },
+    { id: 'cs-it', title: 'Computer Science & IT', group: 'STEM & Technology', icon: Server, color: 'bg-blue-600', description: 'Core computer science, networking, and IT systems.', salary: '₹4L - ₹20L', growth: 'High', steps: getGenericSteps('Computer Science & IT') },
+    { id: 'ai-ml', title: 'Artificial Intelligence / ML', group: 'STEM & Technology', icon: Brain, color: 'bg-purple-600', description: 'Build predictive models and intelligent algorithms.', salary: '₹10L - ₹40L', growth: 'Explosive', steps: getGenericSteps('Artificial Intelligence') },
     { id: 'data-science', title: 'Data Science & Analytics', group: 'STEM & Technology', icon: Database, color: 'bg-teal-600', description: 'Analyze big data to drive business decisions.', salary: '₹8L - ₹35L', growth: 'Very High', steps: getGenericSteps('Data Science') },
     { id: 'cybersecurity', title: 'Cybersecurity / Ethical Hacking', group: 'STEM & Technology', icon: Shield, color: 'bg-red-600', description: 'Protect networks and digital assets from threats.', salary: '₹7L - ₹30L', growth: 'Very High', steps: getGenericSteps('Cybersecurity') },
-    { 
-      id: 'software-dev', 
-      title: 'Software Development (SDE Roadmap)', 
-      group: 'STEM & Technology', 
-      icon: Code, 
-      color: 'bg-blue-500', 
-      description: '🚀 Complete SDE Roadmap (From 12th → Job). 1st Year: Basics. 2nd Year: DSA + Projects. 3rd Year: Placement.', 
-      salary: '₹6L - ₹30L', 
-      growth: 'High', 
-      steps: [
-        {
-          id: 'step1',
-          title: 'PHASE 1: Foundation Phase (After 12th)',
-          description: '📌 Choose Your Path: BCA/B.Tech focus = skills > degree.\n\n💻 Learn Programming Basics (C++ or Python):\n• Variables, loops, conditions\n• Functions\n• Arrays & Strings\n• Pointers (important in C++)\n\n👉 Goal: Write basic programs without thinking much.',
-          icon: BookOpen,
-          duration: '0-6 Months',
-          skills: ['C++', 'Python', 'Basic Logic']
-        },
-        {
-          id: 'step2',
-          title: 'PHASE 2: Core Problem Solving (DSA)',
-          description: '📚 Learn in this order:\n• Time & Space Complexity\n• Arrays & Strings\n• Recursion & Linked List\n• Stack, Queue, Trees & Hashing\n\n👉 Platforms: LeetCode, CodeChef, GeeksforGeeks\n👉 Target: Solve 300–500 problems.',
-          icon: Brain,
-          duration: '6-12 Months',
-          skills: ['Data Structures', 'Algorithms']
-        },
-        {
-          id: 'step3',
-          title: 'PHASE 3: Development Skills',
-          description: '🔥 Option A: Web Dev (Recommended)\nHTML/CSS/JS, React.js, Node.js + Express, MongoDB/MySQL. Build: Portfolio, Chat app, Student System, EduAdvisory.\n\n📱 Option B: App Dev (Flutter/React Native)\n🤖 Option C: AI/ML (Python, NumPy, Pandas)',
-          icon: Layout,
-          duration: '6-12 Months',
-          skills: ['React.js', 'Node.js', 'MongoDB']
-        },
-        {
-          id: 'step4',
-          title: 'PHASE 4: Projects + Resume',
-          description: 'Build 3–5 Strong Projects:\n• Full-stack project (must)\n• API-based project\n• One unique project (AI/chatbot etc.)\n\n👉 Example: Upgrade C++ chatbot with AI, or build a study app MVP.',
-          icon: Code,
-          duration: '2-4 Months',
-          skills: ['System Design', 'APIs', 'Git/GitHub']
-        },
-        {
-          id: 'step5',
-          title: 'PHASE 5: Internships + Hackathons',
-          description: 'Apply on:\n• Internshala, LinkedIn, Wellfound\n\nParticipate in:\n• Hackathons & Ideathons\n\n👉 Goal: 1–2 internships before final year.',
-          icon: Briefcase,
-          duration: 'Parallel'
-        },
-        {
-          id: 'step6',
-          title: 'PHASE 6: Placement Prep',
-          description: 'Focus on:\n• DSA revision & basic System Design\n• DBMS, OS, Computer Networks (basics)\n\nPractice:\n• Mock interviews & Resume building',
-          icon: Award,
-          exams: ['Mock Interviews'],
-          skills: ['System Design', 'DBMS', 'OS', 'CN']
-        },
-        {
-          id: 'step7',
-          title: '⏳ FINAL TIMELINE (Simple View)',
-          description: '• 1st Year: Programming + Basics\n• 2nd Year: DSA + Projects\n• 3rd Year: Internships + Advanced + Placement',
-          icon: GraduationCap,
-          duration: '3 Years Overview'
-        }
-      ]
-    },
+    { id: 'software-dev', title: 'Software Development', group: 'STEM & Technology', icon: Code, color: 'bg-blue-500', description: 'Design and build software applications.', salary: '₹6L - ₹25L', growth: 'High', steps: getGenericSteps('Software Development') },
     { id: 'web-dev', title: 'Web Development', group: 'STEM & Technology', icon: Layout, color: 'bg-indigo-500', description: 'Create dynamic websites and web applications.', salary: '₹4L - ₹20L', growth: 'High', steps: getGenericSteps('Web Development') },
     { id: 'mobile-dev', title: 'Mobile App Development', group: 'STEM & Technology', icon: Smartphone, color: 'bg-green-500', description: 'Build native and cross-platform mobile apps.', salary: '₹5L - ₹22L', growth: 'High', steps: getGenericSteps('Mobile Development') },
     { id: 'robotics', title: 'Robotics & Automation', group: 'STEM & Technology', icon: Cpu, color: 'bg-zinc-600', description: 'Design and maintain robotic systems.', salary: '₹6L - ₹20L', growth: 'High', steps: getGenericSteps('Robotics') },
@@ -447,10 +279,10 @@ export default function CareerRoadmap() {
     { id: 'react-native', title: 'React Native Developer', group: 'STEM & Technology', icon: Smartphone, color: 'bg-blue-400', description: 'Build native mobile apps using React and JavaScript.', salary: '₹6L - ₹24L', growth: 'Very High', steps: getGenericSteps('React Native') },
     { id: 'kotlin-dev', title: 'Kotlin Developer', group: 'STEM & Technology', icon: Code, color: 'bg-orange-500', description: 'Modern Android and backend development using Kotlin.', salary: '₹6L - ₹22L', growth: 'High', steps: getGenericSteps('Kotlin Development') },
     { id: 'swift-dev', title: 'Swift Developer', group: 'STEM & Technology', icon: Code, color: 'bg-orange-600', description: 'Native Apple ecosystem programming using Swift.', salary: '₹6L - ₹25L', growth: 'High', steps: getGenericSteps('Swift Development') },
-    { id: 'mobile-app-dev', title: 'Mobile App Developer', group: 'STEM & Technology', icon: Smartphone, color: 'bg-indigo-500', description: 'General mobile application creation and maintenance.', salary: '₹5L - ₹20L', growth: 'High', steps: getGenericSteps('Mobile Development') },
+    { id: 'mobile-dev', title: 'Mobile App Developer', group: 'STEM & Technology', icon: Smartphone, color: 'bg-indigo-500', description: 'General mobile application creation and maintenance.', salary: '₹5L - ₹20L', growth: 'High', steps: getGenericSteps('Mobile Development') },
 
     // ==========================================
-    // 4. ARTIFICIAL INTELLIGENCE & ML (Additional ML Specific roles)
+    // 4. ARTIFICIAL INTELLIGENCE & ML
     // ==========================================
     { id: 'ai-eng', title: 'AI Engineer', group: 'Emerging & Specialized', icon: Brain, color: 'bg-purple-600', description: 'Design and deploy artificial intelligence models.', salary: '₹10L - ₹40L', growth: 'Explosive', steps: getGenericSteps('AI Engineering') },
     { id: 'ml-eng', title: 'Machine Learning Engineer', group: 'Emerging & Specialized', icon: Cpu, color: 'bg-fuchsia-500', description: 'Create algorithms that learn from and make predictions on data.', salary: '₹8L - ₹35L', growth: 'Explosive', steps: getGenericSteps('Machine Learning') },
@@ -473,7 +305,7 @@ export default function CareerRoadmap() {
     // ==========================================
     // 6. CYBERSECURITY
     // ==========================================
-    // { id: 'ethical-hacker', title: 'Ethical Hacker', group: 'Emerging & Specialized', icon: Lock, color: 'bg-red-600', description: 'Hack into systems legally to fix security vulnerabilities.', salary: '₹7L - ₹28L', growth: 'Very High', steps: getGenericSteps('Ethical Hacking') }, // Already in Emerging
+    { id: 'ethical-hacker', title: 'Ethical Hacker', group: 'Emerging & Specialized', icon: Lock, color: 'bg-red-600', description: 'Hack into systems legally to fix security vulnerabilities.', salary: '₹7L - ₹28L', growth: 'Very High', steps: getGenericSteps('Ethical Hacking') },
     { id: 'cyber-analyst', title: 'Cybersecurity Analyst', group: 'STEM & Technology', icon: Shield, color: 'bg-red-700', description: 'Monitor networks for security breaches and investigate attacks.', salary: '₹5L - ₹20L', growth: 'Very High', steps: getGenericSteps('Cybersecurity Analysis') },
     { id: 'pen-tester', title: 'Penetration Tester', group: 'Emerging & Specialized', icon: Terminal, color: 'bg-rose-700', description: 'Simulate cyber attacks to evaluate system security.', salary: '₹6L - ₹25L', growth: 'High', steps: getGenericSteps('Penetration Testing') },
     { id: 'sec-eng', title: 'Security Engineer', group: 'STEM & Technology', icon: Shield, color: 'bg-orange-600', description: 'Build and maintain IT security systems for organizations.', salary: '₹8L - ₹28L', growth: 'High', steps: getGenericSteps('Security Engineering') },
@@ -575,12 +407,14 @@ export default function CareerRoadmap() {
     // ==========================================
     // NON-TECH / GOVT / ARTS / MEDICAL (TO KEEP IT "ONE-STOP")
     // ==========================================
-    // { id: 'doctor', title: 'Doctor (MBBS / Specialist)', group: 'Medical & Healthcare', icon: Stethoscope, color: 'bg-red-500', description: 'Diagnose and treat medical conditions.', salary: '₹8L - ₹30L+', growth: 'High', steps: getGenericSteps('Medical Practice') }, // Already in Medical
-    // { id: 'nursing', title: 'Nursing / Pharmacy', group: 'Medical & Healthcare', icon: Users, color: 'bg-pink-500', description: 'Nursing, Pharmacy, and Physiotherapy.', salary: '₹3L - ₹12L', growth: 'Stable', steps: getGenericSteps('Healthcare Support') }, // Already in Medical
+    { id: 'doctor', title: 'Doctor (MBBS / Specialist)', group: 'Medical & Healthcare', icon: Stethoscope, color: 'bg-red-500', description: 'Diagnose and treat medical conditions.', salary: '₹8L - ₹30L+', growth: 'High', steps: getGenericSteps('Medical Practice') },
+    { id: 'nursing', title: 'Nursing / Pharmacy', group: 'Medical & Healthcare', icon: Users, color: 'bg-pink-500', description: 'Nursing, Pharmacy, and Physiotherapy.', salary: '₹3L - ₹12L', growth: 'Stable', steps: getGenericSteps('Healthcare Support') },
     { id: 'ca-cs', title: 'CA / Company Secretary', group: 'Business & Finance', icon: Calculator, color: 'bg-emerald-600', description: 'Manage corporate finances, taxation, and compliance.', salary: '₹8L - ₹25L', growth: 'High', steps: getGenericSteps('Chartered Accountancy') },
     { id: 'lawyer', title: 'Lawyer / Legal Studies', group: 'Arts & Humanities', icon: Gavel, color: 'bg-stone-600', description: 'Practice law, corporate legal advisory, or judiciary.', salary: '₹5L - ₹30L+', growth: 'Moderate', steps: getGenericSteps('Legal Studies') },
-    // { id: 'upsc', title: 'UPSC (IAS / IPS / IFS / IRS)', group: 'Government & Civil Services', icon: Building2, color: 'bg-amber-800', description: 'Top-tier civil services and administration.', salary: '₹56k - ₹2.5L/mo', growth: 'Prestige', steps: getGenericSteps('UPSC Civil Services') }, // Already in Govt
-    // { id: 'defense', title: 'Defense (Army, Navy, AF)', group: 'Government & Civil Services', icon: Anchor, color: 'bg-emerald-700', description: 'Serve the nation as a commissioned officer.', salary: '₹7L - ₹15L', growth: 'Prestige', steps: getGenericSteps('Defense Services') } // Already in Govt
+    { id: 'upsc', title: 'UPSC (IAS / IPS / IFS / IRS)', group: 'Government & Civil Services', icon: Building2, color: 'bg-amber-800', description: 'Top-tier civil services and administration.', salary: '₹56k - ₹2.5L/mo', growth: 'Prestige', steps: getGenericSteps('UPSC Civil Services') },
+    { id: 'defense', title: 'Defense (Army, Navy, AF)', group: 'Government & Civil Services', icon: Anchor, color: 'bg-emerald-700', description: 'Serve the nation as a commissioned officer.', salary: '₹7L - ₹15L', growth: 'Prestige', steps: getGenericSteps('Defense Services') }
+
+
   ];
 
   const groups: (CareerCategory | 'All')[] = [
@@ -719,7 +553,7 @@ export default function CareerRoadmap() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
-                        <p className="text-gray-600 mt-1 whitespace-pre-line">{step.description}</p>
+                        <p className="text-gray-600 mt-1">{step.description}</p>
                       </div>
                       {step.duration && (
                         <span className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-500 whitespace-nowrap shadow-sm">
