@@ -231,6 +231,7 @@ export default function App() {
             <QuizResult 
               onDashboard={() => setView('dashboard')}
               onRetake={() => setView('careerQuiz')}
+              quizResult={userData.quizResults}
             />
           </motion.div>
         )}

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Palette, Cpu, Users, PenTool, ArrowLeft, ArrowRight, Star, Zap, Trophy, Target, BrainCircuit, Rocket, CheckCircle, ArrowUp } from 'lucide-react';
+import { Palette, Cpu, Users, PenTool, ArrowLeft, ArrowRight, Star, Zap, Trophy, Target, BrainCircuit, Rocket, CheckCircle, ArrowUp, ChevronDown, ChevronRight as ChevronRightIcon } from 'lucide-react';
+
+
 
 // 15 Questions
 const quizQuestions = [
@@ -103,6 +105,19 @@ const ModernCloud = ({ delay, yOffset, speed, scale = 1 }: { delay: number, yOff
     </div>
   </motion.div>
 );
+
+// =============================================
+// RESULT REDIRECT COMPONENT
+// =============================================
+function ResultRedirect({ result, onComplete }: {
+  result: any;
+  onComplete: () => void;
+}) {
+  useEffect(() => {
+    onComplete();
+  }, [onComplete]);
+  return <div className="min-h-screen bg-orange-50" />;
+}
 
 interface CareerQuizProps {
   userData?: any;
@@ -303,71 +318,11 @@ export default function CareerQuiz({ onComplete, onSkip }: CareerQuizProps) {
   }
 
   // ==========================================
-  // 2. RESULTS SCREEN
+  // 2. RESULT REDIRECT
   // ==========================================
   if (step === 'result') {
     const result = calculateIdentity();
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 relative font-sans">
-        <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-gray-900 to-gray-800 rounded-b-[60px] shadow-xl"></div>
-        
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white w-full max-w-3xl rounded-[32px] shadow-xl shadow-gray-200/50 overflow-hidden relative z-10 border border-gray-100 mt-10"
-        >
-          {/* Top Banner section */}
-          <div className="px-10 py-12 flex flex-col items-center text-center relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 via-pink-500 to-green-500"></div>
-             
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-100 text-green-700 text-xs font-bold uppercase tracking-wider mb-8">
-               <Trophy size={14} /> Course Clear
-             </div>
-             
-             <div className={`w-24 h-24 rounded-full ${result.bg} ${result.color} flex items-center justify-center mb-6 shadow-inner ring-8 ring-white`}>
-               <result.icon size={48} />
-             </div>
-             
-             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">{result.title}</h2>
-             <p className={`font-bold uppercase tracking-widest text-sm ${result.color}`}>{result.subtitle}</p>
-          </div>
-          
-          {/* Details Section */}
-          <div className="bg-gray-50/50 px-10 py-8 border-t border-gray-100">
-             <p className="text-gray-600 text-center text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed font-medium">
-               "{result.description}"
-             </p>
-             
-             <div className="mb-8">
-               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider text-center mb-4">Recommended Career Paths</p>
-               <div className="flex flex-wrap justify-center gap-3">
-                 {result.careers.map((career, idx) => (
-                   <span key={idx} className="bg-white text-gray-700 px-5 py-2.5 rounded-xl border border-gray-200 font-bold text-sm shadow-sm flex items-center gap-2">
-                     <BrainCircuit size={16} className="text-orange-400" />
-                     {career}
-                   </span>
-                 ))}
-               </div>
-             </div>
-             
-             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 border-t border-gray-100">
-                <button 
-                  onClick={() => { setPlayerAnswers([]); setStep('intro'); setScore(0); hitBlockRef.current = null; physics.current.x = 50; }} 
-                  className="px-6 py-3.5 bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-all shadow-sm flex-1 max-w-[200px]"
-                >
-                  Play Again
-                </button>
-                <button 
-                  onClick={() => onComplete && onComplete(result)} 
-                  className="px-6 py-3.5 bg-orange-500 hover:bg-orange-600 shadow-md shadow-orange-500/20 text-white font-bold rounded-xl transition-all flex-1 max-w-[240px]"
-                >
-                  Save & View Roadmap
-                </button>
-             </div>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <ResultRedirect result={result} onComplete={() => onComplete && onComplete(result)} />;
   }
 
   // ==========================================
